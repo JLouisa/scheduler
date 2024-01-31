@@ -1,13 +1,13 @@
-use crate::domain::PlanError::InvalidName;
+use crate::domain::week::WeekError;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct Name(String);
 
 impl Name {
-    pub fn new(name: &str) -> Result<Self, InvalidName> {
+    pub fn new(name: &str) -> Result<Self, WeekError> {
         if name.trim().is_empty() {
-            Err(InvalidName("Name is empty".to_owned()))
+            Err(WeekError::InvalidNameError("Name is empty".to_owned()))
         } else {
             Ok(Self(name.to_owned()))
         }

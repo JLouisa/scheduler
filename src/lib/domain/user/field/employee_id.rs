@@ -1,13 +1,15 @@
-use crate::domain::PlanError::InvalidName;
+use crate::domain::user::UserError;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct EmployeeID(String);
 
 impl EmployeeID {
-    pub fn new(employee_id: &str) -> Result<Self, InvalidName> {
+    pub fn new(employee_id: &str) -> Result<Self, UserError> {
         if employee_id.trim().is_empty() {
-            Err(InvalidName("employee_id is empty".to_owned()))
+            Err(UserError::InvalidEmployeeID(
+                "employee_id is empty".to_owned(),
+            ))
         } else {
             Ok(Self(employee_id.to_owned()))
         }

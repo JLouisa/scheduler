@@ -1,3 +1,4 @@
+use chrono::{DateTime, Datelike, Utc};
 use derive_more::{Display, From};
 use serde::{Deserialize, Serialize};
 // use sqlx::Sqlite;
@@ -5,13 +6,13 @@ use std::str::FromStr;
 use uuid::Uuid;
 
 pub mod model;
-pub mod query;
+// pub mod query;
 
-#[derive(Debug, thiserror::Error)]
-pub enum DbError {
-    #[error("Database error: {0}")]
-    DatabaseError(#[from] sqlx::Error),
-}
+// #[derive(Debug, thiserror::Error)]
+// pub enum DbError {
+//     #[error("Database error: {0}")]
+//     DatabaseError(#[from] sqlx::Error),
+// }
 
 // pub type AppDatabase = Database<Sqlite>;
 // pub type DatabasePool = sqlx::sqlite::SqlitePool;
@@ -49,6 +50,7 @@ impl DbId {
     pub fn new() -> DbId {
         Uuid::new_v4().into()
     }
+
     pub fn nil() -> DbId {
         Self(Uuid::nil())
     }
@@ -71,5 +73,36 @@ impl FromStr for DbId {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         Ok(Self(Uuid::parse_str(s)?))
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Display, From)]
+pub struct DbWeekId(String);
+
+impl DbWeekId {
+    pub fn new() -> DbWeekId {
+        let week = Utc::now().iso_week();
+        let week_id = format!("{week:?}",);
+        Self(week_id)
+    }
+}
+
+impl From<DbWeekId> for String {
+    fn from(id: DbWeekId) -> Self {
+        format!("{}", id.0)
+    }
+}
+
+impl Default for DbWeekId {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl FromStr for DbWeekId {
+    type Err = uuid::Error;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        Ok(Self(s.to_string()))
     }
 }

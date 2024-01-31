@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
 #[derive(Debug, Error)]
-pub enum PlanError {
+pub enum AvailabilityError {
     #[error("Id parse error: {0}")]
     Id(#[from] uuid::Error),
     #[error("Invalid name: {0}")]
@@ -16,9 +16,10 @@ pub enum PlanError {
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
-pub struct Plan {
-    pub user_id: field::UserId,
+pub struct Availability {
+    pub user_id: field::AvailabilityId,
+    pub week_id: field::WeekId,
     pub name: field::Name,
-    pub day: field::Day,
+    pub day: field::Days,
     pub time: field::Time,
 }

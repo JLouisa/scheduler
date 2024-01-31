@@ -1,8 +1,7 @@
-use crate::domain::UserError;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
-pub struct Admin(bool);
+pub struct Active(bool);
 
 impl Active {
     pub fn new(active: bool) -> Self {
@@ -11,8 +10,8 @@ impl Active {
     pub fn into_inner(self) -> bool {
         self.0
     }
-    pub fn flip(&mut self) -> bool {
-        let new = self.0 = !self.0;
+    pub fn flip(self) -> bool {
+        let new: bool = !self.0;
         return new;
     }
 }

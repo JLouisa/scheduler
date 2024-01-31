@@ -1,14 +1,13 @@
-use crate::domain::user::UserError;
-
+use crate::domain::availability::AvailabilityError;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct Name(String);
 
 impl Name {
-    pub fn new(name: &str) -> Result<Self, UserError> {
+    pub fn new(name: &str) -> Result<Self, AvailabilityError> {
         if name.trim().is_empty() {
-            Err(UserError::InvalidName("Name is empty".to_owned()))
+            Err(AvailabilityError::InvalidName("Name is empty".to_owned()))
         } else {
             Ok(Self(name.to_owned()))
         }

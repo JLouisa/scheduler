@@ -2,28 +2,22 @@ use crate::data::DbId;
 use derive_more::Constructor;
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct UserId(DbId);
+#[derive(Debug, Clone, Serialize, Deserialize, Constructor)]
+pub struct UserID(DbId);
 
-impl UserId {
-    pub fn new() -> Self {
-        Self(DbId::new())
-    }
-}
-
-impl UserId {
+impl UserID {
     pub fn into_inner(self) -> DbId {
         self.0
     }
 }
 
-impl From<DbId> for UserId {
+impl From<DbId> for UserID {
     fn from(id: DbId) -> Self {
         Self(id)
     }
 }
 
-impl Default for UserId {
+impl Default for UserID {
     fn default() -> Self {
         Self(DbId::nil())
     }

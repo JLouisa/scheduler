@@ -1,13 +1,9 @@
-use crate::domain::UserError;
+use crate::domain::user::UserError;
+
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct MinDays(u8);
-
-#[derive(Debug)]
-pub enum UserError {
-    InvalidMinDays(String),
-}
 
 impl MinDays {
     pub fn new(min_days: &str) -> Result<Self, UserError> {

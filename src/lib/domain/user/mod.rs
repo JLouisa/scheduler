@@ -8,6 +8,8 @@ pub enum UserError {
     #[error("Id parse error: {0}")]
     Id(#[from] uuid::Error),
     #[error("Invalid name: {0}")]
+    InvalidName(String),
+    #[error("Invalid employee ID: {0}")]
     InvalidEmployeeID(String),
     #[error("Invalid admin: {0}")]
     InvalidAdmin(String),
@@ -26,15 +28,15 @@ pub enum UserError {
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
-pub struct user {
-    id: uuid,
-    name: field::Name,
-    employee_id: field::EmployeeID,
-    admin: field::Admin,
-    vast: field::Vast,
-    active: field::Active,
-    min_days: field::MinDays,
-    max_days: field::MaxDays,
-    role_primary: field::RolePrimary,
-    role_secondary: field::RoleSecondary,
+pub struct User {
+    pub id: field::UserID,
+    pub name: field::Name,
+    pub employee_id: field::EmployeeID,
+    pub admin: field::Admin,
+    pub vast: field::Vast,
+    pub active: field::Active,
+    pub min_days: field::MinDays,
+    pub max_days: field::MaxDays,
+    pub role_primary: field::RolePrimary,
+    pub role_secondary: field::RoleSecondary,
 }
