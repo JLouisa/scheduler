@@ -1,0 +1,41 @@
+{
+  "admin": "Faynalie",
+  "date": "2024-01-30T13:28:41.476581922Z",
+  "availabilities": {
+    "monday": [
+      { "id": 1, "name": "Anne", "time": 17 },
+      { "id": 2, "name": "Boris", "time": 15 },
+      { "id": 6, "name": "Kimberly", "time": 13 }
+    ],
+    "tuesday": [
+      { "id": 1, "name": "Anne", "time": 17 },
+      { "id": 2, "name": "Boris", "time": 15 },
+      { "id": 6, "name": "Kimberly", "time": 13 }
+    ],
+    "wednesday": [
+      { "id": 1, "name": "Anne", "time": 17 },
+      { "id": 2, "name": "Boris", "time": 15 },
+      { "id": 6, "name": "Kimberly", "time": 13 }
+    ],
+    "thursday": [
+      { "id": 1, "name": "Anne", "time": 17 },
+      { "id": 2, "name": "Boris", "time": 15 },
+      { "id": 6, "name": "Kimberly", "time": 13 }
+    ],
+    "friday": [
+      { "id": 1, "name": "Anne", "time": 17 },
+      { "id": 2, "name": "Boris", "time": 15 },
+      { "id": 6, "name": "Kimberly", "time": 13 }
+    ],
+    "saturday": [
+      { "id": 1, "name": "Anne", "time": 17 },
+      { "id": 2, "name": "Boris", "time": 15 },
+      { "id": 6, "name": "Kimberly", "time": 13 }
+    ],
+    "sunday": [
+      { "id": 1, "name": "Anne", "time": 17 },
+      { "id": 2, "name": "Boris", "time": 15 },
+      { "id": 6, "name": "Kimberly", "time": 13 }
+    ]
+  }
+}

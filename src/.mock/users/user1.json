@@ -1,0 +1,12 @@
+{
+  "id": 1,
+  "name": "Greg",
+  "employeeID": 1,
+  "isAdmin": true,
+  "isVast": true,
+  "isActive": true,
+  "minDays": 5,
+  "maxDays": 5,
+  "rolePrimary": "management",
+  "roleSecondary": "all"
+}

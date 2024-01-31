@@ -1,0 +1,12 @@
+{
+  "id": 2,
+  "name": "Boris",
+  "employeeID": 2,
+  "isAdmin": false,
+  "isVast": true,
+  "isActive": true,
+  "minDays": 5,
+  "maxDays": 5,
+  "rolePrimary": "griller",
+  "roleSecondary": "kitchen"
+}
