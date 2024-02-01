@@ -1,108 +1,36 @@
-use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-// use std::collections::HashMap;
+use std::convert::TryFrom;
+use std::str::FromStr;
 
-#[derive(Debug, Serialize, Deserialize)]
-pub struct Availability {
-    pub name: String,
-    pub time: u8,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct Availabilities {
-    pub monday: Vec<Availability>,
-    pub tuesday: Vec<Availability>,
-    pub wednesday: Vec<Availability>,
-    pub thursday: Vec<Availability>,
-    pub friday: Vec<Availability>,
-    pub saturday: Vec<Availability>,
-    pub sunday: Vec<Availability>,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct MockData {
-    pub admin: String,
-    pub date: DateTime<Utc>,
-    pub availabilities: Availabilities,
-}
+use crate::data::DbId;
+use crate::domain::availability::{field, Availability, AvailabilityError};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct PlanJson {
-    id: String,
-    user: String,
+    user_id: String,
+    name: String,
     day: String,
     time: String,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
-enum Day {
-    Monday,
-    Tuesday,
-    Wednesday,
-    Thursday,
-    Friday,
-    Saturday,
-    Sunday,
-}
-impl Day {
-    fn from_str(day: &String) -> Day {
-        match day.to_lowercase().as_str() {
-            "monday" => Day::Monday,
-            "tuesday" => Day::Tuesday,
-            "wednesday" => Day::Wednesday,
-            "thursday" => Day::Thursday,
-            "friday" => Day::Friday,
-            "saturday" => Day::Saturday,
-            "sunday" => Day::Sunday,
-            _ => unreachable!("Invalid day"),
-        }
+impl TryFrom<PlanJson> for Availability {
+    type Error = AvailabilityError;
+    fn try_from(plan: PlanJson) -> Result<Availability, Self::Error> {
+        // Parse the user_id string into a DbId
+        let user_id = DbId::from_str(&plan.user_id)?;
+
+        // Create a new Availability instance
+        Ok(Availability {
+            user_id: field::AvailabilityId::new(user_id),
+            weekly_id: field::WeeklyId::new(),
+            name: field::Name::new(plan.name.as_str())?,
+            day: field::Days::new(plan.day.as_str()),
+            time: field::Time::new(plan.time.as_str()),
+        })
     }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
-pub enum Time {
-    StartAtOne,
-    StartAtThree,
-    StartAtFive,
-    StartAtSix,
-    StartOneEndFive,
-    StartThreeEndFive,
-    Custom(String),
-    OnCall(String),
-}
-impl Time {
-    pub fn from_str(s: &str) -> Time {
-        match s {
-            "13" => Time::StartAtOne,
-            "15" => Time::StartAtThree,
-            "17" => Time::StartAtFive,
-            "18" => Time::StartAtSix,
-            "13-17" => Time::StartOneEndFive,
-            "15-17" => Time::StartThreeEndFive,
-            _ => Time::Custom(s.to_owned()),
-        }
-    }
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct Plan {
-    id: String,
-    user: String,
-    day: Day,
-    time: Time,
-}
-impl Plan {
-    fn new(plan: PlanJson) -> Plan {
-        Plan {
-            id: plan.id,
-            user: plan.user,
-            day: Day::from_str(&plan.day),
-            time: Time::from_str(&plan.time),
-        }
-    }
-}
-
-pub fn get_mock_data(num: &str) -> Plan {
+pub fn get_mock_data(num: &str) -> Result<Availability, AvailabilityError> {
     let json = std::fs::read_to_string(format!("src/.mock/plan/plan{num}.json"))
         .expect("Failed to read file");
 
@@ -110,7 +38,7 @@ pub fn get_mock_data(num: &str) -> Plan {
     let plan_json: PlanJson = serde_json::from_str(json.as_str()).expect("Failed to parse JSON");
 
     // Create a PlanJson instance with extracted day and time
-    let plan = Plan::new(plan_json);
+    let plan = Availability::try_from(plan_json);
 
     return plan;
 }

@@ -1,17 +1,16 @@
-use chrono::{DateTime, Datelike, Utc};
+use chrono::{Datelike, Utc};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct WeekId(String);
+pub struct WeeklyId(String);
 
-impl WeekId {
+impl WeeklyId {
     pub fn new() -> Self {
         let time = Utc::now();
         let year = time.year();
         let week = time.iso_week().week();
-        let week_id = format!("{}-{}", year, week);
-        let week_id = format!("{}-{}", year, week);
-        Self(week_id)
+        let weekly_id = format!("{}-{}", year, week);
+        Self(weekly_id)
     }
 
     pub fn into_inner(self) -> String {

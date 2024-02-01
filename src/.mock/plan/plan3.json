@@ -1,1 +1,6 @@
-{ "id": "3", "user": "Jonathan", "day": "wednesday", "time": "17" }
+{
+  "user_id": "71ee89b6-e7b0-4b6f-9e69-50e1b740babc",
+  "name": "Jonathan",
+  "day": "wednesday",
+  "time": "17"
+}

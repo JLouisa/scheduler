@@ -15,7 +15,18 @@ pub enum ScheduleDay {
     Sunday,
 }
 impl ScheduleDay {
-    fn from_str(day: &str) -> ScheduleDay {
+    fn from_const(day: &ScheduleDay) -> String {
+        match day {
+            ScheduleDay::Monday => "Monday".to_owned(),
+            ScheduleDay::Tuesday => "Tuesday".to_owned(),
+            ScheduleDay::Wednesday => "Wednesday".to_owned(),
+            ScheduleDay::Thursday => "Thursday".to_owned(),
+            ScheduleDay::Friday => "Friday".to_owned(),
+            ScheduleDay::Saturday => "Saturday".to_owned(),
+            ScheduleDay::Sunday => "Sunday".to_owned(),
+        }
+    }
+    pub fn from_str(day: &str) -> ScheduleDay {
         match day.to_lowercase().as_str() {
             "monday" => ScheduleDay::Monday,
             "tuesday" => ScheduleDay::Tuesday,
@@ -25,17 +36,6 @@ impl ScheduleDay {
             "saturday" => ScheduleDay::Saturday,
             "sunday" => ScheduleDay::Sunday,
             _ => unreachable!("Invalid day"),
-        }
-    }
-    fn from_const(day: ScheduleDay) -> String {
-        match day {
-            ScheduleDay::Monday => "Monday".to_owned(),
-            ScheduleDay::Tuesday => "Tuesday".to_owned(),
-            ScheduleDay::Wednesday => "Wednesday".to_owned(),
-            ScheduleDay::Thursday => "Thursday".to_owned(),
-            ScheduleDay::Friday => "Friday".to_owned(),
-            ScheduleDay::Saturday => "Saturday".to_owned(),
-            ScheduleDay::Sunday => "Sunday".to_owned(),
         }
     }
 }
@@ -52,7 +52,7 @@ pub enum ScheduleTime {
     OnCall(String),
 }
 impl ScheduleTime {
-    pub fn to_num(&self) -> String {
+    pub fn from_const(&self) -> String {
         match self {
             ScheduleTime::StartAtOne => "13".to_owned(),
             ScheduleTime::StartAtThree => "15".to_owned(),

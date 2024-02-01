@@ -4,8 +4,8 @@ pub use availability_id::AvailabilityId;
 mod name;
 pub use name::Name;
 
-mod week_id;
-pub use week_id::WeekId;
+mod weekly_id;
+pub use weekly_id::WeeklyId;
 
 mod days;
 pub use days::Days;
