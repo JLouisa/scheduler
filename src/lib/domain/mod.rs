@@ -4,7 +4,7 @@ pub mod week;
 
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, PartialOrd, Eq, Clone, Copy)]
 pub enum ScheduleDay {
     Monday,
     Tuesday,
@@ -40,7 +40,7 @@ impl ScheduleDay {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, PartialOrd, Eq, Clone)]
 pub enum ScheduleTime {
     StartAtOne,
     StartAtThree,
@@ -77,7 +77,7 @@ impl ScheduleTime {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, PartialOrd, Eq, Clone)]
 pub enum Role {
     Griller,
     Kitchen,

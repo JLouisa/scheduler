@@ -27,7 +27,7 @@ pub enum UserError {
     InvalidRoleSecondary(String),
 }
 
-#[derive(Debug, Clone, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct User {
     pub id: field::UserID,
     pub name: field::Name,

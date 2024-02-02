@@ -1,18 +1,22 @@
 use crate::domain::availability::Availability;
 use crate::domain::user;
-use crate::domain::week::field;
+use crate::domain::{week::field, ScheduleDay};
 
 use crate::data::db;
 use crate::web;
 
-struct Employee(field::Name);
+struct Employee {
+    id: field::UserId,
+    name: String,
+    time: field::Time,
+}
 
 struct Employees {
     manager: Employee,
     griller: Employee,
     bar: Employee,
-    servers: Vec<Employee>,
     dishwashers: Vec<Employee>,
+    servers: Vec<Employee>,
 }
 
 struct MondaySchedule {
@@ -20,6 +24,22 @@ struct MondaySchedule {
     day: field::Days,
     employees: Employees,
 }
+
+fn get_managers<'a>(list: &'a Vec<Availability>) -> Vec<&'a Availability> {
+    let managers = list
+        .iter()
+        .filter(|availability| availability.day.into_inner() == ScheduleDay::Monday)
+        .collect::<Vec<&'a Availability>>();
+
+    println!("managers: {:?}", managers);
+
+    managers
+}
+
+fn get_griller() {}
+fn get_bar() {}
+fn get_servers() {}
+fn get_dishwashers() {}
 
 pub fn calc_monday_schedule() {
     let available1 = web::get_mock_data("1").expect("Failed to get mock data");
