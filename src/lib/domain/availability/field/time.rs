@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::domain::ScheduleTime;
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, Clone, Copy)]
 pub struct Time(ScheduleTime);
 
 impl Time {
@@ -11,6 +11,9 @@ impl Time {
     }
     pub fn into_inner(self) -> ScheduleTime {
         self.0
+    }
+    pub fn create(time: ScheduleTime) -> Self {
+        Self(time)
     }
     pub fn as_str(&self) -> String {
         ScheduleTime::from_const(&self.0)

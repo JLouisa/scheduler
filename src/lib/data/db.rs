@@ -67,3 +67,12 @@ pub fn get_mock_user(id: &str) -> Result<User, UserError> {
 
     return user;
 }
+
+pub fn get_all_mock_users(num: u16) -> Vec<User> {
+    let mut user_list: Vec<User> = Vec::new();
+    for i in 1..=num {
+        let user = get_mock_user(&i.to_string().as_str()).expect("Failed to get mock user");
+        user_list.push(user);
+    }
+    return user_list;
+}

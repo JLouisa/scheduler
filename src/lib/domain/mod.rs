@@ -40,7 +40,7 @@ impl ScheduleDay {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq, PartialOrd, Eq, Clone)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, PartialOrd, Eq, Clone, Copy)]
 pub enum ScheduleTime {
     StartAtOne,
     StartAtThree,
@@ -48,8 +48,11 @@ pub enum ScheduleTime {
     StartAtSix,
     FromOneToFive,
     FromThreeToFive,
-    Custom(String),
-    OnCall(String),
+    OnCallAtFive,
+    OnCallAtSix,
+    OnCallAtFiveStartAtSix,
+    Free,
+    None,
 }
 impl ScheduleTime {
     pub fn from_const(&self) -> String {
@@ -60,8 +63,11 @@ impl ScheduleTime {
             ScheduleTime::StartAtSix => "18".to_owned(),
             ScheduleTime::FromOneToFive => "13-17".to_owned(),
             ScheduleTime::FromThreeToFive => "15-17".to_owned(),
-            ScheduleTime::Custom(n) => n.to_owned(),
-            ScheduleTime::OnCall(n) => n.to_owned(),
+            ScheduleTime::OnCallAtFive => "(17)".to_owned(),
+            ScheduleTime::OnCallAtSix => "(18)".to_owned(),
+            ScheduleTime::OnCallAtFiveStartAtSix => "(17)18".to_owned(),
+            ScheduleTime::Free => "free".to_owned(),
+            ScheduleTime::None => "".to_owned(),
         }
     }
     pub fn from_str(s: &str) -> ScheduleTime {
@@ -72,7 +78,11 @@ impl ScheduleTime {
             "18" => ScheduleTime::StartAtSix,
             "13-17" => ScheduleTime::FromOneToFive,
             "15-17" => ScheduleTime::FromThreeToFive,
-            _ => ScheduleTime::Custom(s.to_string().to_owned()),
+            "(17)" => ScheduleTime::OnCallAtFive,
+            "(18)" => ScheduleTime::OnCallAtSix,
+            "(17)18" => ScheduleTime::OnCallAtFiveStartAtSix,
+            "free" => ScheduleTime::Free,
+            _ => ScheduleTime::None,
         }
     }
 }

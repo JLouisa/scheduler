@@ -7,8 +7,8 @@ impl Vast {
     pub fn new(vast: bool) -> Self {
         Self(vast)
     }
-    pub fn into_inner(self) -> bool {
-        self.0
+    pub fn into_inner(&self) -> &bool {
+        &self.0
     }
     pub fn flip(self) -> bool {
         let new: bool = !self.0;

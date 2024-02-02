@@ -2,7 +2,7 @@ use crate::domain::{user::UserError, Role};
 
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct RoleSecondary(Role);
 
 impl RoleSecondary {
@@ -15,8 +15,8 @@ impl RoleSecondary {
             Ok(Self(Role::from_str(role)))
         }
     }
-    pub fn into_inner(self) -> Role {
-        self.0
+    pub fn into_inner(&self) -> &Role {
+        &self.0
     }
     pub fn to_const(self) -> String {
         Role::from_const(&self.0)

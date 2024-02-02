@@ -2,7 +2,7 @@ use crate::domain::user::UserError;
 
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Deserialize, Serialize)]
+#[derive(Debug, Clone, Deserialize, Serialize, PartialEq, Eq, PartialOrd, Ord)]
 pub struct MinDays(u8);
 
 impl MinDays {

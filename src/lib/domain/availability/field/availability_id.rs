@@ -9,6 +9,9 @@ impl AvailabilityId {
     pub fn into_inner(self) -> DbId {
         self.0
     }
+    pub fn to_the_string(&self) -> String {
+        self.0.to_string().to_owned()
+    }
 }
 
 impl From<DbId> for AvailabilityId {

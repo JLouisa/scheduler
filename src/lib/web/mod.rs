@@ -42,3 +42,12 @@ pub fn get_mock_data(num: &str) -> Result<Availability, AvailabilityError> {
 
     return plan;
 }
+
+pub fn get_all_mock_data(num: u16) -> Vec<Availability> {
+    let mut availability_list: Vec<Availability> = Vec::new();
+    for i in 1..=num {
+        let plan = get_mock_data(&i.to_string().as_str()).expect("Failed to get mock data");
+        availability_list.push(plan);
+    }
+    return availability_list;
+}

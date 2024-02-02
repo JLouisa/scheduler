@@ -15,7 +15,7 @@ pub enum AvailabilityError {
     InvalidTime(String),
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct Availability {
     pub user_id: field::AvailabilityId,
     pub weekly_id: field::WeeklyId,
