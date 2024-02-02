@@ -1,12 +1,12 @@
 {
-  "id": 2,
+  "id": "c4a760a8-dbcf-5254-a0d9-6a4474bd1b62",
   "name": "Boris",
-  "employeeID": 2,
-  "isAdmin": false,
-  "isVast": true,
-  "isActive": true,
-  "minDays": 5,
-  "maxDays": 5,
-  "rolePrimary": "griller",
-  "roleSecondary": "kitchen"
+  "employee_id": "2",
+  "admin": "false",
+  "vast": "true",
+  "active": "true",
+  "min_days": "5",
+  "max_days": "5",
+  "role_primary": "griller",
+  "role_secondary": "kitchen"
 }

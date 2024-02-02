@@ -90,15 +90,15 @@ pub enum Role {
 }
 impl Role {
     pub fn from_str(s: &str) -> Role {
-        match s {
-            "Griller" => Role::Griller,
-            "Kitchen" => Role::Kitchen,
-            "Bar" => Role::Bar,
-            "Service" => Role::Service,
-            "Management" => Role::Management,
-            "Dishwasher" => Role::Dishwasher,
-            "None" => Role::None,
-            "All" => Role::All,
+        match s.to_lowercase().as_str() {
+            "griller" => Role::Griller,
+            "kitchen" => Role::Kitchen,
+            "bar" => Role::Bar,
+            "service" => Role::Service,
+            "management" => Role::Management,
+            "dishwasher" => Role::Dishwasher,
+            "none" => Role::None,
+            "all" => Role::All,
             _ => Role::None,
         }
     }

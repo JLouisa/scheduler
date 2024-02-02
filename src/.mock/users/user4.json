@@ -1,0 +1,12 @@
+{
+  "id": "3888344f-c038-48c4-947b-06227a92e027",
+  "name": "Charmaine",
+  "employee_id": "4",
+  "admin": "false",
+  "vast": "false",
+  "active": "true",
+  "min_days": "3",
+  "max_days": "4",
+  "role_primary": "service",
+  "role_secondary": "kitchen"
+}

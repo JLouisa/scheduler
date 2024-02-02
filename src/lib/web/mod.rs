@@ -32,7 +32,7 @@ impl TryFrom<PlanJson> for Availability {
 
 pub fn get_mock_data(num: &str) -> Result<Availability, AvailabilityError> {
     let json = std::fs::read_to_string(format!("src/.mock/plan/plan{num}.json"))
-        .expect("Failed to read file");
+        .expect("Failed to read plan json file");
 
     // Parse the JSON into a PlanJson instance
     let plan_json: PlanJson = serde_json::from_str(json.as_str()).expect("Failed to parse JSON");

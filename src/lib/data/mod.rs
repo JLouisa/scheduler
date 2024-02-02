@@ -5,6 +5,7 @@ use serde::{Deserialize, Serialize};
 use std::str::FromStr;
 use uuid::Uuid;
 
+pub mod db;
 pub mod model;
 // pub mod query;
 

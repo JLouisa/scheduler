@@ -1,0 +1,12 @@
+{
+  "id": "02b0d8cb-8b1b-4c18-8ddc-32e6d3d566a7",
+  "name": "Kimberly",
+  "employee_id": "5",
+  "admin": "false",
+  "vast": "false",
+  "active": "true",
+  "min_days": "3",
+  "max_days": "4",
+  "role_primary": "dishwasher",
+  "role_secondary": "null"
+}
