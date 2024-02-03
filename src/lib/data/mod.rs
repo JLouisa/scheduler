@@ -44,7 +44,7 @@ pub mod model;
 //     }
 // }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Display, From)]
+#[derive(Debug, Clone, Serialize, Deserialize, Display, From, Copy)]
 pub struct DbId(Uuid);
 
 impl DbId {

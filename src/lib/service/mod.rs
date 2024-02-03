@@ -49,6 +49,21 @@ fn get_random_number(num: usize) -> usize {
     return random_index;
 }
 
+// Function that iterates through a list of users and returns the user with the highest max_days
+fn get_user_with_highest_max_days(list: &Vec<User>) -> User {
+    let mut num = 0;
+    let mut the_user = None;
+
+    for user in list.iter() {
+        if user.max_days.ref_into_inner() > num {
+            num = user.max_days.ref_into_inner();
+            the_user = Some(user.clone());
+        }
+    }
+
+    return the_user.expect("No user found");
+}
+
 fn get_managers(
     list: Vec<availability::Availability>,
     user_list: &Vec<User>,
@@ -58,18 +73,23 @@ fn get_managers(
     let binding1 = user_list.clone();
     let list_all_management_users = binding1
         .iter()
+        .cloned()
         .filter(|user| {
             user.role_secondary.into_inner() == &Role::Management
                 || user.role_primary.into_inner() == &Role::Management
         })
-        .collect::<Vec<&User>>();
+        .collect::<Vec<User>>();
 
     // 2. Get list of Managers with vast = true from all users with Management Role
-    let binding2 = list_all_management_users.clone();
-    let list_vast_managers = binding2
+    let list_vast_managers = binding1
         .iter()
-        .filter(|user| user.vast.into_inner() == &true)
-        .collect::<Vec<&&User>>();
+        .cloned()
+        .filter(|user| {
+            user.vast.into_inner() == &true && user.role_secondary.into_inner() == &Role::Management
+                || user.role_primary.into_inner() == &Role::Management
+        })
+        // .filter(|user| user.vast.into_inner() == &true)
+        .collect::<Vec<User>>();
 
     // 1. Get list of all available users on Monday from available users
     let monday_available_users = list
@@ -105,9 +125,11 @@ fn get_managers(
 
     // Process:
     // 4. Compare id of Manager with vast to available managers on Monday
-    let binding3: Vec<&&User> = list_vast_managers.clone();
-    if list_all_available_managers.len() < 1 {
-        let generate_needed_manager = binding3.iter().max_by_key(|item| item.max_days).unwrap();
+
+    if list_all_available_managers.is_empty() {
+        let generate_needed_manager = get_user_with_highest_max_days(&list_vast_managers);
+
+        // Create new availability for the needed manager
         let new_available_manager = availability::Availability {
             user_id: field::AvailabilityId::new(
                 DbId::from_str(generate_needed_manager.id.to_the_string().as_str())
@@ -120,15 +142,29 @@ fn get_managers(
             time: field::Time::create(ScheduleTime::StartAtOne),
         };
         return vec![new_available_manager];
+    } else if list_vast_managers.is_empty() {
+        let mut the_manager_list = vec![];
+        for i in 0..logic.to_owned() {
+            println!("Round {}", i + 1);
+            let num = get_random_number(list_all_available_managers.len());
+            let manager = list_all_available_managers.get(num).unwrap();
+            the_manager_list.push(manager.to_owned());
+        }
+        return the_manager_list;
     } else {
-        // do Something else
-        // let len = list_vast_managers.len();
-        // let get_random_manager = list_vast_managers[get_random_number(len)];
+        let mut the_manager_list = vec![];
+        for i in 0..logic.to_owned() {
+            println!("Round {}", i + 1);
+            let num = get_random_number(list_all_available_managers.len());
+            let manager = list_all_available_managers.get(num).unwrap();
+            the_manager_list.push(manager.to_owned());
+        }
+        return the_manager_list;
     }
 }
 
 pub fn calc_monday_schedule() {
-    let print_lines = false;
+    // let print_lines = false;
     // The maximum number of employees needed for each position
     let schedule_logic = Logic {
         manager: 1,
@@ -145,5 +181,7 @@ pub fn calc_monday_schedule() {
     // 2. All the users from the database
     let all_users = db::get_all_mock_users(6);
 
+    // Process Manager
     let manager = get_managers(all_availability, &all_users, &schedule_logic.manager);
+    println!("Manager: {:?}", manager);
 }

@@ -22,4 +22,7 @@ impl MaxDays {
     pub fn into_inner(self) -> u8 {
         self.0
     }
+    pub fn ref_into_inner(&self) -> u8 {
+        self.0
+    }
 }
