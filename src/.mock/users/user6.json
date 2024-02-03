@@ -1,0 +1,12 @@
+{
+  "id": "a8788fe5-bb8b-4d90-a7f3-f1bd78296fca",
+  "name": "Llewellyn",
+  "employee_id": "5",
+  "admin": "false",
+  "vast": "false",
+  "active": "true",
+  "min_days": "3",
+  "max_days": "4",
+  "role_primary": "service",
+  "role_secondary": "none"
+}

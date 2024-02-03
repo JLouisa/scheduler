@@ -20,12 +20,29 @@ const currentWeek = getWeekNumber(new Date());
 
 async function writeToFile(folder, file, num, dataJSON) {
   try {
-    await fs.writeFile(`./${folder}/${file}${num + 1}.json`, dataJSON);
+    await fs.writeFile(
+      `./src/.mock/${folder}/${file}${num + 1}.json`,
+      dataJSON
+    );
     console.log(`File has been created for ${file}`);
   } catch (err) {
     console.log(err);
   }
 }
+
+const time = [
+  "13",
+  "15",
+  "17",
+  "18",
+  "13-17",
+  "15-17",
+  "(17)",
+  "(18)",
+  "(17)18",
+  "available",
+  "free",
+];
 
 const weekDays = [
   "monday",
@@ -38,19 +55,22 @@ const weekDays = [
 ];
 
 const roles = [
-  "management",
-  "Bar",
-  "service",
-  "dishwasher",
   "griller",
   "kitchen",
+  "bar",
+  "service",
+  "management",
+  "dishwasher",
+  "none",
   "all",
 ];
 
 for (let n = 0; n < 10; n++) {
   let ID = uuidv4();
   let name = faker.person.firstName();
-  let num = Math.floor(Math.random() * 6);
+  let maxNum = Math.floor(Math.random() * 5);
+  let roleNum = Math.floor(Math.random() * roles.length);
+  let roleSecNum = Math.floor(Math.random() * roles.length);
 
   for (let i = 0; i < 7; i++) {
     const userPlan = {
@@ -58,7 +78,7 @@ for (let n = 0; n < 10; n++) {
       weekly_id: `${currentYear}-${currentWeek}`,
       name: name,
       day: weekDays[i],
-      time: "15",
+      time: time[Math.floor(Math.random() * time.length)],
     };
 
     const dataPlan = JSON.stringify(userPlan, null, 2);
@@ -73,15 +93,16 @@ for (let n = 0; n < 10; n++) {
     admin: "false",
     vast: "false",
     active: "true",
-    min_days: `${num - 1 < 0 ? 0 : num}`,
-    max_days: `${num}`,
+    min_days: `${maxNum - 1 < 0 ? 1 : maxNum - 1}`,
+    max_days: `${maxNum}`,
     role_primary:
-      roles[num] == "all"
+      roles[roleNum] == "all"
         ? "service"
-        : roles[num] == "none"
+        : roles[roleNum] == "none"
         ? "service"
-        : roles[num],
-    role_secondary: roles[Math.floor(Math.random() * 6)],
+        : roles[roleNum],
+    role_secondary:
+      roles[roleSecNum] == "management" ? "all" : roles[roleSecNum],
   };
 
   const dataJSON = JSON.stringify(userData, null, 2);

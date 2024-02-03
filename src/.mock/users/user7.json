@@ -1,0 +1,12 @@
+{
+  "id": "d1da0025-fc03-46cf-bd37-ac4f0b6e058c",
+  "name": "Guy",
+  "employee_id": "6",
+  "admin": "false",
+  "vast": "false",
+  "active": "true",
+  "min_days": "2",
+  "max_days": "3",
+  "role_primary": "service",
+  "role_secondary": "dishwasher"
+}

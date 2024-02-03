@@ -1,0 +1,12 @@
+{
+  "id": "9fd4ce35-c31d-414f-9222-96791a9299fd",
+  "name": "Chasity",
+  "employee_id": "3",
+  "admin": "false",
+  "vast": "false",
+  "active": "true",
+  "min_days": "1",
+  "max_days": "1",
+  "role_primary": "bar",
+  "role_secondary": "griller"
+}

@@ -52,6 +52,7 @@ pub enum ScheduleTime {
     OnCallAtFive,
     OnCallAtSix,
     OnCallAtFiveStartAtSix,
+    Available,
     Free,
     None,
 }
@@ -67,6 +68,7 @@ impl ScheduleTime {
             ScheduleTime::OnCallAtFive => "(17)".to_owned(),
             ScheduleTime::OnCallAtSix => "(18)".to_owned(),
             ScheduleTime::OnCallAtFiveStartAtSix => "(17)18".to_owned(),
+            ScheduleTime::Available => "available".to_owned(),
             ScheduleTime::Free => "free".to_owned(),
             ScheduleTime::None => "".to_owned(),
         }
@@ -82,6 +84,7 @@ impl ScheduleTime {
             "(17)" => ScheduleTime::OnCallAtFive,
             "(18)" => ScheduleTime::OnCallAtSix,
             "(17)18" => ScheduleTime::OnCallAtFiveStartAtSix,
+            "available" => ScheduleTime::Available,
             "free" => ScheduleTime::Free,
             _ => ScheduleTime::None,
         }

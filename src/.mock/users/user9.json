@@ -1,0 +1,12 @@
+{
+  "id": "88955b22-b6c3-4780-85b3-ee885d44ab89",
+  "name": "Linda",
+  "employee_id": "8",
+  "admin": "false",
+  "vast": "false",
+  "active": "true",
+  "min_days": "1",
+  "max_days": "2",
+  "role_primary": "service",
+  "role_secondary": "none"
+}
