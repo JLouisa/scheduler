@@ -2,9 +2,10 @@ pub mod availability;
 pub mod user;
 pub mod week;
 
+use enum_iterator::Sequence;
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Serialize, Deserialize, PartialEq, PartialOrd, Eq, Clone, Copy)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, PartialOrd, Eq, Clone, Copy, Sequence)]
 pub enum ScheduleDay {
     Monday,
     Tuesday,
@@ -87,7 +88,7 @@ impl ScheduleTime {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq, PartialOrd, Eq, Clone)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, PartialOrd, Eq, Clone, Sequence)]
 pub enum Role {
     Griller,
     Kitchen,

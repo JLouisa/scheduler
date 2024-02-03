@@ -2,23 +2,19 @@ use crate::domain::{week::WeekError, ScheduleDay};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
-pub struct Days(String);
+pub struct Days(ScheduleDay);
 
 impl Days {
-    pub fn new(day: &str) -> Result<Self, WeekError> {
-        if day.trim().is_empty() {
-            Err(WeekError::InvalidDayError("Day is empty".to_owned()))
-        } else {
-            Ok(Self(day.to_owned()))
-        }
+    pub fn new(days: &str) -> Self {
+        Self(ScheduleDay::from_str(days))
     }
-    pub fn into_inner(self) -> String {
-        self.0
+    pub fn into_inner(&self) -> &ScheduleDay {
+        &self.0
     }
-    pub fn as_str(&self) -> &str {
-        self.0.as_str()
+    pub fn create(days: ScheduleDay) -> Self {
+        Self(days)
     }
-    pub fn to_const(self) -> ScheduleDay {
-        ScheduleDay::from_str(self.0.as_str())
+    pub fn as_str(&self) -> String {
+        ScheduleDay::from_const(&self.0)
     }
 }

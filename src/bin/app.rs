@@ -1,5 +1,6 @@
 use scheduler::service;
 
 fn main() {
-    service::calc_monday_schedule();
+    let new_week = service::schedule_setup();
+    println!("Week Schedule: {:?}", new_week);
 }
