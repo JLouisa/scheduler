@@ -21,6 +21,7 @@ pub struct Employee {
 pub struct Employees {
     manager: Vec<Employee>,
     griller: Vec<Employee>,
+    kitchen: Vec<Employee>,
     bar: Vec<Employee>,
     dishwashers: Vec<Employee>,
     servers: Vec<Employee>,
@@ -47,7 +48,7 @@ pub struct WeekSchedule {
 pub fn get_user(
     list: &Vec<availability::Availability>,
     user_list: &Vec<User>,
-    logic: &u8,
+    logic: &Vec<ScheduleTime>,
     role: &Role,
     day: &ScheduleDay,
 ) -> Vec<availability::Availability> {
@@ -109,12 +110,14 @@ pub fn get_user(
         println!("No available users on {:?} for {:?}", day, role);
         let generate_needed_manager = lib::get_user_with_highest_max_days(&list_vast_users);
 
-        // Create new availability for the needed manager
+        // Check if the day is Monday to adjust the time
         let the_time = if day == &ScheduleDay::Monday {
             &ScheduleTime::StartAtOne
         } else {
             &ScheduleTime::StartAtThree
         };
+
+        // Create new availability for the needed manager
         let new_available_manager = availability::Availability {
             user_id: field::AvailabilityId::new(
                 DbId::from_str(generate_needed_manager.id.to_the_string().as_str())
@@ -131,18 +134,23 @@ pub fn get_user(
         // check if the list of vast managers is empty
     } else if list_vast_users.is_empty() {
         let mut the_manager_list = vec![];
-        for i in 0..logic.to_owned() {
-            println!("Round {}", i + 1);
-            let num = lib::get_random_number(list_all_available_users.len());
-            let manager = list_all_available_users.get(num).unwrap();
-            the_manager_list.push(manager.to_owned());
+        if role == &Role::Service {
+            for i in 0..logic.len().to_owned() {
+                println!("Round {}", i + 1);
+                let num = lib::get_random_number(list_all_available_users.len());
+                let manager = list_all_available_users
+                    .get(num)
+                    .expect("could not get manager");
+                the_manager_list.push(manager.to_owned());
+            }
+        } else {
         }
         return the_manager_list;
 
         // Process the available list x amount of time
     } else {
         let mut the_manager_list = vec![];
-        for _ in 0..logic.to_owned() {
+        for _ in 0..logic.len().to_owned() {
             let num = lib::get_random_number(list_all_available_users.len());
             let manager = list_all_available_users.get(num).unwrap();
             the_manager_list.push(manager.to_owned());
@@ -151,11 +159,11 @@ pub fn get_user(
     }
 }
 
-/// Calculate the schedule for a role of the user
+///* Calculate the schedule for a role of the user
 pub fn calc_schedule_role(
     available_list: &Vec<Availability>,
     user_list: &Vec<User>,
-    logic: &u8,
+    logic: &Vec<ScheduleTime>,
     role: &Role,
     day: &ScheduleDay,
 ) -> Vec<Employee> {
@@ -182,7 +190,7 @@ pub fn calc_schedule_role(
     return list;
 }
 
-/// Calculate the schedule for a day of the week
+///* Calculate the schedule for a day of the week
 pub fn calc_schedule_day(
     all_availability: &Vec<Availability>,
     all_users: &Vec<User>,
@@ -204,6 +212,13 @@ pub fn calc_schedule_day(
                 all_users,
                 &schedule_logic.griller,
                 &Role::Griller,
+                day,
+            ),
+            kitchen: calc_schedule_role(
+                all_availability,
+                all_users,
+                &schedule_logic.kitchen,
+                &Role::Kitchen,
                 day,
             ),
             bar: calc_schedule_role(
@@ -232,7 +247,7 @@ pub fn calc_schedule_day(
     return the_day;
 }
 
-/// Calculate the schedule for week of the staff
+///* Calculate the schedule for week of the staff
 pub fn calc_schedule_week(
     all_availability: &Vec<Availability>,
     all_users: &Vec<User>,

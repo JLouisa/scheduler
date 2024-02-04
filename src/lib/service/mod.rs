@@ -2,17 +2,33 @@ pub mod lib;
 pub mod scheduler;
 
 use crate::data::db;
+use crate::domain::ScheduleTime;
 use crate::web;
 
 use self::scheduler::WeekSchedule;
 
+// #[derive(Debug)]
+// struct Service {
+//     server1: (ScheduleTime, u8),
+//     server2: (ScheduleTime, u8),
+//     server3: (ScheduleTime, u8),
+//     server4: (ScheduleTime, u8),
+// }
+
+// #[derive(Debug)]
+// struct Kitchen {
+//     server1: (ScheduleTime, u8),
+//     server2: (ScheduleTime, u8),
+// }
+
 #[derive(Debug)]
 pub struct Logic {
-    manager: u8,
-    griller: u8,
-    bar: u8,
-    dishwashers: u8,
-    servers: u8,
+    manager: Vec<ScheduleTime>,
+    griller: Vec<ScheduleTime>,
+    kitchen: Vec<ScheduleTime>,
+    bar: Vec<ScheduleTime>,
+    dishwashers: Vec<ScheduleTime>,
+    servers: Vec<ScheduleTime>,
 }
 
 pub fn schedule_setup() -> WeekSchedule {
@@ -24,11 +40,17 @@ pub fn schedule_setup() -> WeekSchedule {
 
     // 3. Get the schedule logic
     let schedule_logic = Logic {
-        manager: 1,
-        griller: 1,
-        bar: 1,
-        dishwashers: 1,
-        servers: 3,
+        manager: vec![ScheduleTime::StartAtThree],
+        griller: vec![ScheduleTime::StartAtThree],
+        kitchen: vec![ScheduleTime::StartAtThree, ScheduleTime::StartAtSix],
+        bar: vec![ScheduleTime::StartAtThree],
+        dishwashers: vec![ScheduleTime::StartAtSix],
+        servers: vec![
+            ScheduleTime::StartAtThree,
+            ScheduleTime::StartAtFive,
+            ScheduleTime::StartAtSix,
+            ScheduleTime::OnCallAtSix,
+        ],
     };
 
     // Get the schedule for the week
