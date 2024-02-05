@@ -1,7 +1,7 @@
 use chrono::{Datelike, Utc};
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, PartialOrd)]
 pub struct WeeklyId(String);
 
 impl WeeklyId {

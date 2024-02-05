@@ -1,12 +1,12 @@
 {
-  "id": "ccb96b50-0374-473e-ac10-d77dbfa9425b",
-  "name": "Jeromy",
+  "id": "976823a8-44d3-4cfc-9743-7254733beb3a",
+  "name": "Glen",
   "employee_id": "9",
   "admin": "false",
-  "vast": "true",
+  "vast": "false",
   "active": "true",
-  "min_days": "5",
-  "max_days": "5",
+  "min_days": "1",
+  "max_days": "2",
   "role_primary": "griller",
-  "role_secondary": "none"
+  "role_secondary": "all"
 }

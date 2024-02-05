@@ -1,5 +1,6 @@
 pub mod field;
 
+use enum_iterator::Sequence;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
@@ -15,7 +16,7 @@ pub enum AvailabilityError {
     InvalidTime(String),
 }
 
-#[derive(Debug, Deserialize, Serialize, Clone)]
+#[derive(Debug, Deserialize, Serialize, Clone, PartialEq, PartialOrd)]
 pub struct Availability {
     pub user_id: field::AvailabilityId,
     pub weekly_id: field::WeeklyId,

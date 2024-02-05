@@ -1,12 +1,12 @@
 {
-  "id": "e69c35b5-3b15-42d9-9508-4e9d1e42d6d2",
-  "name": "Keshawn",
+  "id": "72ad2d9f-0150-4d19-973f-c4448d949792",
+  "name": "Elfrieda",
   "employee_id": "4",
   "admin": "false",
   "vast": "false",
   "active": "true",
-  "min_days": "2",
-  "max_days": "3",
-  "role_primary": "service",
-  "role_secondary": "service"
+  "min_days": "0",
+  "max_days": "1",
+  "role_primary": "dishwasher",
+  "role_secondary": "griller"
 }

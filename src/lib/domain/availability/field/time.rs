@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::domain::ScheduleTime;
 
-#[derive(Debug, Deserialize, Serialize, Clone, Copy)]
+#[derive(Debug, Deserialize, Serialize, Clone, Copy, PartialEq, PartialOrd)]
 pub struct Time(ScheduleTime);
 
 impl Time {

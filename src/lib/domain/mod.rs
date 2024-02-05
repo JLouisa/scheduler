@@ -41,34 +41,34 @@ impl ScheduleDay {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq, PartialOrd, Eq, Clone, Copy)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, PartialOrd, Eq, Clone, Copy, Sequence)]
 pub enum ScheduleTime {
+    Available,
     StartAtOne,
     StartAtThree,
     StartAtFive,
     StartAtSix,
-    FromOneToFive,
-    FromThreeToFive,
     OnCallAtFive,
     OnCallAtSix,
     OnCallAtFiveStartAtSix,
-    Available,
+    FromOneToFive,
+    FromThreeToFive,
     Free,
     None,
 }
 impl ScheduleTime {
     pub fn from_const(&self) -> String {
         match self {
+            ScheduleTime::Available => "available".to_owned(),
             ScheduleTime::StartAtOne => "13".to_owned(),
             ScheduleTime::StartAtThree => "15".to_owned(),
             ScheduleTime::StartAtFive => "17".to_owned(),
             ScheduleTime::StartAtSix => "18".to_owned(),
-            ScheduleTime::FromOneToFive => "13-17".to_owned(),
-            ScheduleTime::FromThreeToFive => "15-17".to_owned(),
             ScheduleTime::OnCallAtFive => "(17)".to_owned(),
             ScheduleTime::OnCallAtSix => "(18)".to_owned(),
             ScheduleTime::OnCallAtFiveStartAtSix => "(17)18".to_owned(),
-            ScheduleTime::Available => "available".to_owned(),
+            ScheduleTime::FromOneToFive => "13-17".to_owned(),
+            ScheduleTime::FromThreeToFive => "15-17".to_owned(),
             ScheduleTime::Free => "free".to_owned(),
             ScheduleTime::None => "".to_owned(),
         }

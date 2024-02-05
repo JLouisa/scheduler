@@ -1,12 +1,12 @@
 {
-  "id": "461c7cda-fe9b-4cd5-86b7-56c162828234",
-  "name": "Nora",
+  "id": "77a4916c-25db-4c08-acd7-5e1c43d625b8",
+  "name": "Ahmad",
   "employee_id": "7",
   "admin": "false",
   "vast": "false",
   "active": "true",
-  "min_days": "0",
-  "max_days": "0",
-  "role_primary": "dishwasher",
-  "role_secondary": "all"
+  "min_days": "1",
+  "max_days": "2",
+  "role_primary": "management",
+  "role_secondary": "service"
 }

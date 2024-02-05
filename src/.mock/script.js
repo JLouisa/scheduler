@@ -30,19 +30,7 @@ async function writeToFile(folder, file, num, dataJSON) {
   }
 }
 
-const time = [
-  "13",
-  "15",
-  "17",
-  "18",
-  "13-17",
-  "15-17",
-  "(17)",
-  "(18)",
-  "(17)18",
-  "available",
-  "free",
-];
+const time = ["13", "15", "17", "18", "available", "free"];
 
 const weekDays = [
   "monday",
@@ -94,7 +82,7 @@ for (let n = 0; n < 10; n++) {
     vast: "false",
     active: "true",
     min_days: `${maxNum - 1 < 0 ? 1 : maxNum - 1}`,
-    max_days: `${maxNum}`,
+    max_days: `${maxNum == 0 ? 1 : maxNum}`,
     role_primary:
       roles[roleNum] == "all"
         ? "service"

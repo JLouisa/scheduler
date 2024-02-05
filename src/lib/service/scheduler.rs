@@ -13,7 +13,8 @@ use std::str::FromStr;
 pub struct Employee {
     id: availability::field::AvailabilityId,
     name: availability::field::Name,
-    time: availability::field::Time,
+    time_available: availability::field::Time,
+    time_given: availability::field::Time,
     chosen: u8,
 }
 
@@ -69,6 +70,7 @@ pub fn get_user(
         .filter(|user| {
             user.vast.into_inner() == &true && user.role_secondary.into_inner() == role
                 || user.role_primary.into_inner() == role
+                || user.role_secondary.into_inner() == &Role::All
         })
         .collect::<Vec<User>>();
 
@@ -93,9 +95,9 @@ pub fn get_user(
         new_vec
     };
 
-    for manager in monday_available_managers.iter() {
-        println!("User from managers: {:?}", manager);
-    }
+    // for manager in monday_available_managers.iter() {
+    //     println!("User from {:?}: {:?}", role, manager);
+    // }
 
     // 1. List of managers
     // let list_managers = list_all_management_users;
@@ -104,11 +106,13 @@ pub fn get_user(
     // 3. Available managers
     let list_all_available_users = monday_available_managers;
 
+    //? <-------------------->
+
     // Process:
     // check if list of available managers is empty
     if list_all_available_users.is_empty() {
-        println!("No available users on {:?} for {:?}", day, role);
-        let generate_needed_manager = lib::get_user_with_highest_max_days(&list_vast_users);
+        // println!("No available users on {:?} for {:?}", day, role);
+        let generate_needed_manager = lib::get_user_with_highest_max_days(&list_vast_users, role);
 
         // Check if the day is Monday to adjust the time
         let the_time = if day == &ScheduleDay::Monday {
@@ -133,23 +137,24 @@ pub fn get_user(
 
         // check if the list of vast managers is empty
     } else if list_vast_users.is_empty() {
-        let mut the_manager_list = vec![];
-        if role == &Role::Service {
-            for i in 0..logic.len().to_owned() {
-                println!("Round {}", i + 1);
-                let num = lib::get_random_number(list_all_available_users.len());
-                let manager = list_all_available_users
-                    .get(num)
-                    .expect("could not get manager");
-                the_manager_list.push(manager.to_owned());
-            }
-        } else {
+        // Assuming the type of elements in list_all_available_users is User
+        let mut the_manager_list: Vec<Availability> = Vec::new();
+
+        // Sort list_all_available_users in-place by time
+        let list_all_available_users = lib::bubble_sort(&mut list_all_available_users.to_owned());
+
+        // Assuming you want to clone elements from list_all_available_users to the_manager_list
+        for i in 0..logic.len().to_owned() {
+            // for user in list_all_available_users.iter() {
+            // println!("Processing user");
+            the_manager_list.push(list_all_available_users[i].clone());
+            // }
         }
         return the_manager_list;
 
         // Process the available list x amount of time
     } else {
-        let mut the_manager_list = vec![];
+        let mut the_manager_list = Vec::new();
         for _ in 0..logic.len().to_owned() {
             let num = lib::get_random_number(list_all_available_users.len());
             let manager = list_all_available_users.get(num).unwrap();
@@ -158,6 +163,8 @@ pub fn get_user(
         return the_manager_list;
     }
 }
+
+//? <-------------------->
 
 ///* Calculate the schedule for a role of the user
 pub fn calc_schedule_role(
@@ -170,18 +177,31 @@ pub fn calc_schedule_role(
     // Process Manager
     let users = get_user(available_list, user_list, logic, role, day);
 
-    let the_time = if role == &Role::Dishwasher {
-        availability::field::Time::create(ScheduleTime::StartAtSix)
-    } else {
-        availability::field::Time::create(ScheduleTime::StartAtThree)
-    };
+    let mut list = Vec::new();
 
-    let mut list = vec![];
-    for user in users {
+    for i in 0..users.len() {
         let new_employee = Employee {
-            id: user.user_id.to_owned(),
-            name: user.name.to_owned(),
-            time: the_time.to_owned(),
+            id: users[i].user_id.to_owned(),
+            name: users[i].name.to_owned(),
+            time_available: users[i].time.to_owned(),
+            time_given: match role {
+                Role::Dishwasher | Role::Bar => {
+                    availability::field::Time::create(ScheduleTime::StartAtSix)
+                }
+                Role::Management => availability::field::Time::create(ScheduleTime::StartAtThree),
+                _ => match users[i].time.into_inner() {
+                    ScheduleTime::Available => {
+                        availability::field::Time::create(logic[i].to_owned())
+                    }
+                    _ => {
+                        if logic[i] > users[i].time.into_inner() {
+                            availability::field::Time::create(logic[i].to_owned())
+                        } else {
+                            availability::field::Time::create(users[i].time.into_inner())
+                        }
+                    }
+                },
+            },
             chosen: 0,
         };
         list.push(new_employee);

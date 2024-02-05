@@ -1,12 +1,12 @@
 {
-  "id": "d1da0025-fc03-46cf-bd37-ac4f0b6e058c",
-  "name": "Guy",
+  "id": "54fe96de-4dc2-4c3c-95e9-79421249bdf8",
+  "name": "Halle",
   "employee_id": "6",
   "admin": "false",
   "vast": "false",
   "active": "true",
-  "min_days": "2",
-  "max_days": "3",
-  "role_primary": "service",
+  "min_days": "0",
+  "max_days": "1",
+  "role_primary": "kitchen",
   "role_secondary": "dishwasher"
 }

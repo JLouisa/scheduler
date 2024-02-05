@@ -1,12 +1,12 @@
 {
-  "id": "33cb8f4e-cb4c-4e57-91cc-e2ee11822123",
-  "name": "Arlo",
+  "id": "3da93583-e85f-4e21-b0b7-ade14abd72ae",
+  "name": "Ted",
   "employee_id": "0",
   "admin": "false",
-  "vast": "false",
+  "vast": "true",
   "active": "true",
-  "min_days": "3",
-  "max_days": "4",
-  "role_primary": "kitchen",
-  "role_secondary": "griller"
+  "min_days": "5",
+  "max_days": "5",
+  "role_primary": "griller",
+  "role_secondary": "kitchen"
 }

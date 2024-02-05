@@ -1,7 +1,7 @@
 use crate::domain::availability::AvailabilityError;
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Deserialize, Serialize)]
+#[derive(Debug, Clone, Deserialize, Serialize, PartialEq, PartialOrd)]
 pub struct Name(String);
 
 impl Name {

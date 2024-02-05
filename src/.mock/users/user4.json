@@ -1,12 +1,12 @@
 {
-  "id": "9fd4ce35-c31d-414f-9222-96791a9299fd",
-  "name": "Chasity",
+  "id": "5b3e2a19-fd6d-478e-a69c-3c679449f34a",
+  "name": "Geraldine",
   "employee_id": "3",
   "admin": "false",
   "vast": "false",
   "active": "true",
-  "min_days": "1",
-  "max_days": "1",
-  "role_primary": "bar",
-  "role_secondary": "griller"
+  "min_days": "2",
+  "max_days": "3",
+  "role_primary": "dishwasher",
+  "role_secondary": "service"
 }

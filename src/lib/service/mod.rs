@@ -7,20 +7,6 @@ use crate::web;
 
 use self::scheduler::WeekSchedule;
 
-// #[derive(Debug)]
-// struct Service {
-//     server1: (ScheduleTime, u8),
-//     server2: (ScheduleTime, u8),
-//     server3: (ScheduleTime, u8),
-//     server4: (ScheduleTime, u8),
-// }
-
-// #[derive(Debug)]
-// struct Kitchen {
-//     server1: (ScheduleTime, u8),
-//     server2: (ScheduleTime, u8),
-// }
-
 #[derive(Debug)]
 pub struct Logic {
     manager: Vec<ScheduleTime>,
@@ -43,7 +29,7 @@ pub fn schedule_setup() -> WeekSchedule {
         manager: vec![ScheduleTime::StartAtThree],
         griller: vec![ScheduleTime::StartAtThree],
         kitchen: vec![ScheduleTime::StartAtThree, ScheduleTime::StartAtSix],
-        bar: vec![ScheduleTime::StartAtThree],
+        bar: vec![ScheduleTime::StartAtSix],
         dishwashers: vec![ScheduleTime::StartAtSix],
         servers: vec![
             ScheduleTime::StartAtThree,

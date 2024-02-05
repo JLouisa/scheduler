@@ -1,12 +1,12 @@
 {
-  "id": "091152d8-3d42-4380-a2cb-bcf35d8a3481",
-  "name": "Israel",
+  "id": "8ad23b27-707f-429c-b332-f504b2708185",
+  "name": "Jaiden",
   "employee_id": "2",
   "admin": "false",
   "vast": "false",
   "active": "true",
-  "min_days": "2",
-  "max_days": "3",
-  "role_primary": "dishwasher",
-  "role_secondary": "bar"
+  "min_days": "0",
+  "max_days": "1",
+  "role_primary": "service",
+  "role_secondary": "griller"
 }
