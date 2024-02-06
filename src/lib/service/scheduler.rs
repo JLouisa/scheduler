@@ -234,6 +234,8 @@ pub fn calc_schedule_role(
                 },
             },
         };
+        // Increase the chosen count for the user
+        lib::increase_chosen_user_count(users[i].user_id.to_the_string().as_str(), chosen_users);
         list.push(new_employee);
     }
 
