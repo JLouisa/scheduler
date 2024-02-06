@@ -8,6 +8,7 @@ use crate::domain::{week, Role, ScheduleDay, ScheduleTime};
 
 use crate::service::Logic;
 
+use std::collections::HashMap;
 use std::str::FromStr;
 
 use enum_iterator::all;
@@ -18,7 +19,6 @@ pub struct Employee {
     name: availability::field::Name,
     time_available: availability::field::Time,
     time_given: availability::field::Time,
-    chosen: u8,
 }
 
 #[derive(Debug, Clone)]
@@ -55,6 +55,7 @@ pub fn get_user(
     logic: &Vec<ScheduleTime>,
     role: &Role,
     day: &ScheduleDay,
+    chosen_users: &mut HashMap<String, u8>,
 ) -> Vec<availability::Availability> {
     //* Sorting lists
     // 1. Get list of all users with Management Role from users in DB
@@ -91,7 +92,7 @@ pub fn get_user(
     };
 
     // 1. List of managers
-    // let list_managers = list_all_management_users;
+    // let list_user_current_Role = list_all_management_users;
     // 2. List of managers with vast = true && chosen < max day
     let list_vast_users = list_vast_managers;
     // 3. Available managers
@@ -105,6 +106,12 @@ pub fn get_user(
     if list_all_available_users.is_empty() {
         // println!("No available users on {:?} for {:?}", day, role);
         let generate_needed_manager = lib::get_user_with_highest_max_days(&list_vast_users, role);
+
+        // Increase the chosen count for the user
+        lib::increase_chosen_user_count(
+            generate_needed_manager.id.to_the_string().as_str(),
+            chosen_users,
+        );
 
         // Check if the day is Monday to adjust the start time
         let the_time = if day == &ScheduleDay::Monday {
@@ -130,29 +137,60 @@ pub fn get_user(
         // check if the list of vast managers is empty
     } else if list_vast_users.is_empty() {
         // Assuming the type of elements in list_all_available_users is User
-        let mut the_manager_list: Vec<Availability> = Vec::new();
+        let mut the_user_role_list: Vec<Availability> = Vec::new();
 
         // Sort list_all_available_users in-place by time
-        let list_all_available_users = lib::bubble_sort(&mut list_all_available_users.to_owned());
+        let list_all_available_users: Vec<Availability> =
+            lib::bubble_sort(&mut list_all_available_users.to_owned());
 
-        // Assuming you want to clone elements from list_all_available_users to the_manager_list
+        // Sort the list of available users based on chosen count
+        let list_all_available_users = lib::sort_lowest_to_highest_count(
+            list_all_available_users,
+            chosen_users,
+            list_vast_users,
+        );
+
+        // Process the available list (x logic per role) amount of time
         for i in 0..logic.len().to_owned() {
             // for user in list_all_available_users.iter() {
             // println!("Processing user");
-            the_manager_list.push(list_all_available_users[i].clone());
+            the_user_role_list.push(list_all_available_users[i].clone());
             // }
         }
-        return the_manager_list;
-
-        // Process the available list x amount of time
+        return the_user_role_list;
     } else {
-        let mut the_manager_list = Vec::new();
-        for _ in 0..logic.len().to_owned() {
-            let num = lib::get_random_number(list_all_available_users.len());
-            let manager = list_all_available_users.get(num).unwrap();
-            the_manager_list.push(manager.to_owned());
+        // let mut the_user_role_list = Vec::new();
+
+        // // Process the available list (x logic per role) amount of time
+        // for _ in 0..logic.len().to_owned() {
+        //     let num = lib::get_random_number(list_all_available_users.len());
+        //     let manager = list_all_available_users.get(num).unwrap();
+        //     the_user_role_list.push(manager.to_owned());
+        // }
+        // return the_user_role_list;
+
+        // Assuming the type of elements in list_all_available_users is User
+        let mut the_user_role_list: Vec<Availability> = Vec::new();
+
+        // Sort list_all_available_users in-place by time
+        let list_all_available_users: Vec<Availability> =
+            lib::bubble_sort(&mut list_all_available_users.to_owned());
+
+        // Sort the list of available users based on chosen count
+        let list_all_available_users = lib::sort_lowest_to_highest_count(
+            list_all_available_users,
+            chosen_users,
+            list_vast_users,
+        );
+
+        // Process the available list (x logic per role) amount of time
+        for i in 0..logic.len().to_owned() {
+            // for user in list_all_available_users.iter() {
+            // println!("Processing user");
+            the_user_role_list.push(list_all_available_users[i].clone());
+            // }
         }
-        return the_manager_list;
+        return the_user_role_list;
     }
 }
 
@@ -165,9 +203,10 @@ pub fn calc_schedule_role(
     logic: &Vec<ScheduleTime>,
     role: &Role,
     day: &ScheduleDay,
+    chosen_users: &mut HashMap<String, u8>,
 ) -> Vec<Employee> {
     // Process Manager
-    let users = get_user(available_list, user_list, logic, role, day);
+    let users = get_user(available_list, user_list, logic, role, day, chosen_users);
 
     let mut list = Vec::new();
 
@@ -194,7 +233,6 @@ pub fn calc_schedule_role(
                     }
                 },
             },
-            chosen: 0,
         };
         list.push(new_employee);
     }
@@ -208,6 +246,7 @@ pub fn calc_schedule_day(
     all_users: &Vec<User>,
     schedule_logic: &Logic,
     day: &ScheduleDay,
+    chosen_users: &mut HashMap<String, u8>,
 ) -> DaySchedule {
     // Create the vector to hold the roles
     let mut roles: Vec<Vec<Employee>> = Vec::new();
@@ -221,6 +260,7 @@ pub fn calc_schedule_day(
                 &schedule_logic.manager,
                 &role,
                 day,
+                chosen_users,
             );
             roles.push(position)
         }
@@ -247,11 +287,18 @@ pub fn calc_schedule_week(
     all_availability: &Vec<Availability>,
     all_users: &Vec<User>,
     schedule_logic: &Logic,
+    chosen_users: &mut HashMap<String, u8>,
 ) -> WeekSchedule {
     let mut week: Vec<DaySchedule> = Vec::new();
 
     for day in all::<ScheduleDay>() {
-        let the_day = calc_schedule_day(&all_availability, &all_users, &schedule_logic, &day);
+        let the_day = calc_schedule_day(
+            &all_availability,
+            &all_users,
+            &schedule_logic,
+            &day,
+            chosen_users,
+        );
         week.push(the_day)
     }
 
