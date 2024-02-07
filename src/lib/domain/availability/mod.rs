@@ -1,6 +1,5 @@
 pub mod field;
 
-use enum_iterator::Sequence;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 

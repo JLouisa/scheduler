@@ -1,4 +1,4 @@
-use crate::domain::{week::WeekError, ScheduleDay};
+use crate::domain::ScheduleDay;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
