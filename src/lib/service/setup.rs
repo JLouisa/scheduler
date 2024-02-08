@@ -1,11 +1,6 @@
-use std::collections::HashMap;
+use crate::domain::{availability::AvailabilitySpot, user::User, Role, ScheduleDay};
 
-use crate::domain::{
-    availability::AvailabilitySpot,
-    user::{self, User},
-    Role, ScheduleDay,
-};
-
+#[derive(Debug)]
 pub struct Roles {
     pub management: Vec<Option<AvailabilitySpot>>,
     pub griller: Vec<Option<AvailabilitySpot>>,
@@ -14,11 +9,72 @@ pub struct Roles {
     pub dishwasher: Vec<Option<AvailabilitySpot>>,
     pub service: Vec<Option<AvailabilitySpot>>,
 }
+impl Roles {
+    pub fn new(
+        user_list: &Vec<User>,
+        available_list: &Vec<AvailabilitySpot>,
+        day: &ScheduleDay,
+    ) -> Self {
+        Self {
+            management: sort_available_spots_current_day_on_role(
+                user_list,
+                available_list,
+                day,
+                &Role::Management,
+            ),
+            griller: sort_available_spots_current_day_on_role(
+                user_list,
+                available_list,
+                day,
+                &Role::Griller,
+            ),
+            kitchen: sort_available_spots_current_day_on_role(
+                user_list,
+                available_list,
+                day,
+                &Role::Kitchen,
+            ),
+            bar: sort_available_spots_current_day_on_role(
+                user_list,
+                available_list,
+                day,
+                &Role::Bar,
+            ),
+            dishwasher: sort_available_spots_current_day_on_role(
+                user_list,
+                available_list,
+                day,
+                &Role::Dishwasher,
+            ),
+            service: sort_available_spots_current_day_on_role(
+                user_list,
+                available_list,
+                day,
+                &Role::Service,
+            ),
+        }
+    }
+}
 
+#[derive(Debug)]
 pub struct Planning {
     pub day: ScheduleDay,
     pub roles: Roles,
 }
+impl Planning {
+    pub fn new(
+        user_list: &Vec<User>,
+        available_list: &Vec<AvailabilitySpot>,
+        the_day: &ScheduleDay,
+    ) -> Self {
+        Self {
+            day: the_day.clone(),
+            roles: Roles::new(user_list, available_list, &the_day),
+        }
+    }
+}
+
+#[derive(Debug)]
 pub struct InfoMatrix {
     pub monday: Planning,
     pub tuesday: Planning,
@@ -26,6 +82,30 @@ pub struct InfoMatrix {
     pub thursday: Planning,
     pub friday: Planning,
     pub saturday: Planning,
+    pub sunday: Planning,
+}
+impl InfoMatrix {
+    pub fn new(all_users: &Vec<User>, all_availability: &Vec<AvailabilitySpot>) -> Self {
+        Self {
+            monday: Planning::new(all_users, all_availability, &ScheduleDay::Monday),
+            tuesday: Planning::new(all_users, all_availability, &ScheduleDay::Tuesday),
+            wednesday: Planning::new(all_users, all_availability, &ScheduleDay::Wednesday),
+            thursday: Planning::new(all_users, all_availability, &ScheduleDay::Thursday),
+            friday: Planning::new(all_users, all_availability, &ScheduleDay::Friday),
+            saturday: Planning::new(all_users, all_availability, &ScheduleDay::Saturday),
+            sunday: Planning::new(all_users, all_availability, &ScheduleDay::Sunday),
+        }
+    }
+}
+
+// Create info matrix will all available spots sorted on day and role
+pub fn create_info_matrix(
+    all_users: &Vec<User>,
+    all_availability: &Vec<AvailabilitySpot>,
+) -> InfoMatrix {
+    let info_matrix = InfoMatrix::new(&all_users, &all_availability);
+
+    return info_matrix;
 }
 
 // Sort all user list and return list of users based on role
@@ -53,31 +133,33 @@ pub fn filter_available_spots_current_day(
             list.push(Some(spot))
         }
     }
-    // if list.is_empty() {
-    //     list.push(None)
-    // }
     return list;
 }
 
+// Sort all available spots list and return list of available based on day and role
 pub fn sort_available_spots_current_day_on_role(
-    user_list: Vec<User>,
-    available_list: Vec<AvailabilitySpot>,
+    user_list: &Vec<User>,
+    available_list: &Vec<AvailabilitySpot>,
     day: &ScheduleDay,
     role: &Role,
 ) -> Vec<Option<AvailabilitySpot>> {
     let mut final_list: Vec<Option<AvailabilitySpot>> = Vec::new();
+
+    // User on role
     let filtered_user_list: Vec<User> = filter_all_user_on_role(&user_list, role);
-    let available_list_day: Vec<Option<AvailabilitySpot>> =
+
+    // Spots on day
+    let filtered_available_list: Vec<Option<AvailabilitySpot>> =
         filter_available_spots_current_day(available_list.clone(), day);
 
-    if available_list_day.is_empty() {
-        return available_list_day;
+    if filtered_available_list.is_empty() {
+        return filtered_available_list;
     }
 
-    for available in available_list.iter() {
-        for user in filtered_user_list.iter() {
-            if available.user_id.to_the_string() == user.id.to_the_string() {
-                final_list.push(Some(available.clone()));
+    for user in filtered_user_list {
+        for available in filtered_available_list.iter() {
+            if available.clone().unwrap().user_id.to_the_string() == user.id.to_the_string() {
+                final_list.push(available.clone());
             }
         }
     }
@@ -144,18 +226,21 @@ mod test {
         );
 
         // Eve
+
         let available1 = AvailabilitySpot::create(
             "3da93583-e85f-4e21-b0b7-ade14abd72ae",
             "Eve",
             "monday",
             "13",
         );
+
         let available2 = AvailabilitySpot::create(
             "3da93583-e85f-4e21-b0b7-ade14abd72ae",
             "Eve",
             "tuesday",
             "18",
         );
+
         let available3 = AvailabilitySpot::create(
             "3da93583-e85f-4e21-b0b7-ade14abd72ae",
             "Eve",
@@ -163,56 +248,67 @@ mod test {
             "17",
         );
         // Jane
+
         let available4 = AvailabilitySpot::create(
             "a184afa7-1aeb-4cea-b8a8-278caa2dc36a",
             "Jane",
             "monday",
             "15",
         );
+
         let available5 = AvailabilitySpot::create(
             "a184afa7-1aeb-4cea-b8a8-278caa2dc36a",
             "Jane",
             "tuesday",
             "17",
         );
+
         let available6 = AvailabilitySpot::create(
             "a184afa7-1aeb-4cea-b8a8-278caa2dc36a",
             "Jane",
             "thursday",
             "(17)",
         );
+
         // John
+
         let available7 = AvailabilitySpot::create(
             "8ad23b27-707f-429c-b332-f504b2708185",
             "John",
             "monday",
             "18",
         );
+
         let available8 = AvailabilitySpot::create(
             "8ad23b27-707f-429c-b332-f504b2708185",
             "John",
             "tuesday",
             "15",
         );
+
         let available9 = AvailabilitySpot::create(
             "8ad23b27-707f-429c-b332-f504b2708185",
             "John",
             "friday",
             "17(18)",
         );
+
         // Alice
+
         let available10 = AvailabilitySpot::create(
             "5b3e2a19-fd6d-478e-a69c-3c679449f34a",
             "Alice",
             "monday",
             "18",
         );
+
         let available11 = AvailabilitySpot::create(
             "5b3e2a19-fd6d-478e-a69c-3c679449f34a",
             "Alice",
             "tuesday",
             "15",
         );
+
         let available12 = AvailabilitySpot::create(
             "5b3e2a19-fd6d-478e-a69c-3c679449f34a",
             "Alice",
@@ -235,37 +331,37 @@ mod test {
             available11.clone(),
             available12.clone(),
         ];
-        let result = things::sort_available_spots_current_day_on_role(
-            user_list.clone(),
-            available_list.clone(),
+        let result = setup::sort_available_spots_current_day_on_role(
+            &user_list,
+            &available_list,
             &ScheduleDay::Monday,
             &Role::Griller,
         );
         let expected = vec![Some(available1.clone()), Some(available10.clone())];
 
-        let result2 = things::sort_available_spots_current_day_on_role(
-            user_list.clone(),
-            available_list.clone(),
+        let result2 = setup::sort_available_spots_current_day_on_role(
+            &user_list,
+            &available_list,
             &ScheduleDay::Tuesday,
             &Role::Management,
         );
         let expected2 = vec![Some(available8)];
 
-        let result3 = things::sort_available_spots_current_day_on_role(
-            user_list.clone(),
-            available_list.clone(),
+        let result3 = setup::sort_available_spots_current_day_on_role(
+            &user_list,
+            &available_list,
             &ScheduleDay::Thursday,
             &Role::Bar,
         );
-        let expected3 = vec![Some(available6)];
+        let expected3: Vec<Option<AvailabilitySpot>> = vec![Some(available6)];
 
-        let result4 = things::sort_available_spots_current_day_on_role(
-            user_list,
-            available_list,
+        let result4 = setup::sort_available_spots_current_day_on_role(
+            &user_list,
+            &available_list,
             &ScheduleDay::Friday,
             &Role::Bar,
         );
-        let expected4 = vec![];
+        let expected4: Vec<Option<AvailabilitySpot>> = vec![];
 
         assert_eq!(
             result, expected,
@@ -360,20 +456,20 @@ mod test {
             available9.clone(),
         ];
 
-        let result = things::filter_available_spots_current_day(list.clone(), &ScheduleDay::Monday);
+        let result = setup::filter_available_spots_current_day(list.clone(), &ScheduleDay::Monday);
         let expected = vec![Some(available1.clone()), Some(available8.clone())];
 
         let result2 =
-            things::filter_available_spots_current_day(list.clone(), &ScheduleDay::Tuesday);
+            setup::filter_available_spots_current_day(list.clone(), &ScheduleDay::Tuesday);
         let expected2 = vec![Some(available2.clone()), Some(available9.clone())];
 
         let result3 =
-            things::filter_available_spots_current_day(list.clone(), &ScheduleDay::Saturday);
-        let expected3 = vec![Some(available6.clone())];
+            setup::filter_available_spots_current_day(list.clone(), &ScheduleDay::Saturday);
+        let expected3: Vec<Option<AvailabilitySpot>> = vec![Some(available6.clone())];
 
         let list2: Vec<AvailabilitySpot> = Vec::new();
-        let result4 = things::filter_available_spots_current_day(list2, &ScheduleDay::Thursday);
-        let expected4 = vec![];
+        let result4 = setup::filter_available_spots_current_day(list2, &ScheduleDay::Thursday);
+        let expected4: Vec<Option<AvailabilitySpot>> = vec![];
 
         assert_eq!(result, expected, "Creating availability spots on monday");
         assert_eq!(result2, expected2, "Creating availability spots on tuesday");
@@ -485,7 +581,7 @@ mod test {
 
         let users = vec![user1.clone(), user2.clone(), user3.clone(), user4.clone()];
         let role = Role::Service;
-        let result = things::filter_all_user_on_role(&users, &role);
+        let result = setup::filter_all_user_on_role(&users, &role);
         let expected = vec![user2.clone(), user4.clone()];
 
         assert_eq!(
@@ -543,7 +639,7 @@ mod test {
 
         let users = vec![user1.clone(), user2.clone(), user3.clone(), user4.clone()];
         let role = Role::Griller;
-        let result = things::filter_all_user_on_role(&users, &role);
+        let result = setup::filter_all_user_on_role(&users, &role);
         let expected = vec![user1.clone(), user4.clone()];
 
         assert_eq!(
@@ -600,7 +696,7 @@ mod test {
         );
         let users = vec![user1.clone(), user2.clone(), user3.clone(), user4.clone()];
         let role = Role::Management;
-        let result = things::filter_all_user_on_role(&users, &role);
+        let result = setup::filter_all_user_on_role(&users, &role);
         let expected = vec![user3.clone()];
 
         assert_eq!(

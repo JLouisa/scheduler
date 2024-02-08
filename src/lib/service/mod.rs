@@ -1,6 +1,6 @@
 pub mod lib;
 pub mod scheduler;
-pub mod things;
+pub mod setup;
 
 use crate::data::db;
 use crate::domain::ScheduleTime;
@@ -19,7 +19,7 @@ pub struct Logic {
     pub servers: Vec<ScheduleTime>,
 }
 
-pub fn schedule_setup() -> WeekSchedule {
+pub fn schedule_setup() {
     // 1. Get all the users from the database
     let all_users = db::get_all_mock_users(10);
 
@@ -31,7 +31,9 @@ pub fn schedule_setup() -> WeekSchedule {
 
     // 2. Get all the user availability for the week
     let all_availability = web::get_all_mock_data(70);
-    println!("{:?}", all_availability);
+    // println!("{:?}", all_availability);
+
+    let weekly_schedule = setup::create_info_matrix(&all_users, &all_availability);
 
     // 3. Get the schedule logic
     let schedule_logic = Logic {
@@ -49,12 +51,7 @@ pub fn schedule_setup() -> WeekSchedule {
     };
 
     // Get the schedule for the week
-    let week = scheduler::calc_schedule_week(
-        &all_availability,
-        &all_users,
-        &schedule_logic,
-        &mut chosen_users,
-    );
+    let week = scheduler::calc_schedule_week(weekly_schedule, schedule_logic, &mut chosen_users);
 
     return week;
 }
