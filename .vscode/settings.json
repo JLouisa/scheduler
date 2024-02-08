@@ -2,5 +2,5 @@
   "cSpell.ignoreWords": ["mockdata", "uuidv"],
   "rust-analyzer.linkedProjects": ["./Cargo.toml"],
   "rust-analyzer.showUnlinkedFileNotification": false,
-  "cSpell.words": ["Datelike"]
+  "cSpell.words": ["Datelike", "rustfmt"]
 }

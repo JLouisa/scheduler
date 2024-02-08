@@ -7,8 +7,6 @@ use crate::domain::ScheduleTime;
 use crate::web;
 use std::collections::HashMap;
 
-use self::scheduler::WeekSchedule;
-
 #[derive(Debug)]
 pub struct Logic {
     pub manager: Vec<ScheduleTime>,

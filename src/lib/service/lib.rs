@@ -1,13 +1,10 @@
-use crate::data::DbId;
 use crate::domain::availability;
-use crate::domain::availability::field;
 use crate::domain::availability::AvailabilitySpot;
 use crate::domain::user::User;
-use crate::domain::{Role, ScheduleDay, ScheduleTime};
+use crate::domain::{Role, ScheduleDay};
 
 use rand::Rng;
 use std::collections::HashMap;
-use std::str::FromStr;
 
 // Function to get a random number
 pub fn get_random_number(num: usize) -> usize {
@@ -192,4 +189,59 @@ pub fn sort_available_users_on_role(
         }
     }
     new_vec
+}
+
+#[cfg(test)]
+mod test {
+    use crate::domain::availability::field;
+    use crate::domain::availability::AvailabilitySpot;
+    use crate::service::lib;
+
+    #[test]
+    fn test_bubble_sort_on_time() {
+        let id = field::AvailabilityId::default();
+
+        let available1 =
+            AvailabilitySpot::create(id.to_the_string().as_str(), "Eve", "monday", "18");
+        let available2 =
+            AvailabilitySpot::create(id.to_the_string().as_str(), "Jane", "monday", "15");
+        let available3 =
+            AvailabilitySpot::create(id.to_the_string().as_str(), "John", "monday", "(18)");
+        let available4 =
+            AvailabilitySpot::create(id.to_the_string().as_str(), "Adam", "monday", "17");
+        let available5 =
+            AvailabilitySpot::create(id.to_the_string().as_str(), "Arnold", "monday", "(17)18");
+        let available6 =
+            AvailabilitySpot::create(id.to_the_string().as_str(), "Bob", "monday", "13");
+        let available7 =
+            AvailabilitySpot::create(id.to_the_string().as_str(), "Tom", "monday", "available");
+        let available8 =
+            AvailabilitySpot::create(id.to_the_string().as_str(), "Sandra", "monday", "asdf");
+        let available9 =
+            AvailabilitySpot::create(id.to_the_string().as_str(), "Timmy", "monday", "13-17");
+        let available10 =
+            AvailabilitySpot::create(id.to_the_string().as_str(), "Mimi", "monday", "available");
+
+        #[cfg_attr(rustfmt, rustfmt_skip)]
+        let mut list = vec![
+        available1.clone(),   available2.clone(),  available3.clone(), available4.clone(),  available5.clone(),  available6.clone()
+        ];
+        #[cfg_attr(rustfmt, rustfmt_skip)]
+        let expected = vec![
+            available6.clone(), available2.clone(), available4.clone(), available1.clone(), available5.clone(), available3.clone(),
+        ];
+        let result = lib::bubble_sort_on_time(&mut list);
+        assert_eq!(result, expected, "Bubble sort failed first");
+
+        #[cfg_attr(rustfmt, rustfmt_skip)]
+        let mut list2 = vec![
+            available7.clone(),   available8.clone(),  available9.clone(), available10.clone(),
+        ];
+        #[cfg_attr(rustfmt, rustfmt_skip)]
+        let expected2 = vec![
+            available7.clone(), available10.clone(), available9.clone(), available8.clone(),
+        ];
+        let result2 = lib::bubble_sort_on_time(&mut list2);
+        assert_eq!(result2, expected2, "Bubble sort failed second");
+    }
 }
