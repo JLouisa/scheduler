@@ -2,7 +2,7 @@ use crate::domain::{user::UserError, Role};
 
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Deserialize, Serialize, Clone)]
+#[derive(Debug, Deserialize, Serialize, Clone, PartialEq, PartialOrd)]
 pub struct RoleSecondary(Role);
 
 impl RoleSecondary {

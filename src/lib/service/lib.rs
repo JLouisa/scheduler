@@ -1,7 +1,7 @@
 use crate::data::DbId;
 use crate::domain::availability;
 use crate::domain::availability::field;
-use crate::domain::availability::Availability;
+use crate::domain::availability::AvailabilitySpot;
 use crate::domain::user::User;
 use crate::domain::{Role, ScheduleDay, ScheduleTime};
 
@@ -40,7 +40,7 @@ pub fn get_user_with_highest_max_days(list: &Vec<User>) -> Option<User> {
 }
 
 // Function to sort the availability list
-pub fn bubble_sort(arr: &mut Vec<Availability>) -> Vec<Availability> {
+pub fn bubble_sort(arr: &mut Vec<AvailabilitySpot>) -> Vec<AvailabilitySpot> {
     let mut n = arr.len();
     let mut swapped = true;
     let mut arr = arr.clone();
@@ -78,11 +78,11 @@ pub fn increase_chosen_user_count(user: &str, chosen_users_list: &mut HashMap<St
 
 // Function to find the lowest value in a HashMap
 pub fn sort_lowest_to_highest_count(
-    arr: Vec<Availability>,
+    arr: Vec<AvailabilitySpot>,
     hash: &mut HashMap<String, u8>,
     vast_users: Vec<User>,
-) -> Vec<Option<Availability>> {
-    let mut new_arr: Vec<Option<Availability>> = Vec::new();
+) -> Vec<Option<AvailabilitySpot>> {
+    let mut new_arr: Vec<Option<AvailabilitySpot>> = Vec::new();
     let mut new_hash: HashMap<String, u8> = HashMap::new();
 
     // Iterate through the vast list to find the
@@ -167,21 +167,21 @@ pub fn sort_vast_users(user_list: &Vec<User>, role: &Role) -> Vec<User> {
 
 // 2. Get list of all available users on a given day from available users
 pub fn sort_available_users(
-    list: &Vec<availability::Availability>,
+    list: &Vec<availability::AvailabilitySpot>,
     day: &ScheduleDay,
-) -> Vec<availability::Availability> {
+) -> Vec<availability::AvailabilitySpot> {
     return list
         .iter()
         .cloned()
         .filter(|availability| availability.day.into_inner() == day)
-        .collect::<Vec<availability::Availability>>();
+        .collect::<Vec<availability::AvailabilitySpot>>();
 }
 
 // 3. Get list of available roles on a given day from available users on that day
 pub fn sort_available_users_on_role(
     list_vast_users: &Vec<User>,
-    day_available_users: &Vec<availability::Availability>,
-) -> Vec<availability::Availability> {
+    day_available_users: &Vec<availability::AvailabilitySpot>,
+) -> Vec<availability::AvailabilitySpot> {
     let mut new_vec = Vec::new();
 
     for manager in list_vast_users.clone() {
@@ -195,13 +195,13 @@ pub fn sort_available_users_on_role(
 }
 
 pub fn get_available_users(
-    list: &Vec<availability::Availability>,
+    list: &Vec<availability::AvailabilitySpot>,
     user_list: &Vec<User>,
     logic: &Vec<ScheduleTime>,
     role: &Role,
     day: &ScheduleDay,
     chosen_users: &mut HashMap<String, u8>,
-) -> Vec<Option<availability::Availability>> {
+) -> Vec<Option<availability::AvailabilitySpot>> {
     // Debug
     println!("In section 1");
 
@@ -236,7 +236,7 @@ pub fn get_available_users(
                 };
 
                 // Create new availability for the needed manager
-                let new_available_manager = availability::Availability {
+                let new_available_manager = availability::AvailabilitySpot {
                     user_id: field::AvailabilityId::new(
                         DbId::from_str(g_user.id.to_the_string().as_str())
                             .expect("could not create id"),
@@ -260,14 +260,14 @@ pub fn get_available_users(
         println!("In section 2");
 
         // Assuming the type of elements in list_all_available_users is User
-        let mut the_user_role_list: Vec<Option<Availability>> = Vec::new();
+        let mut the_user_role_list: Vec<Option<AvailabilitySpot>> = Vec::new();
 
         // Sort list_all_available_users in-place by time
-        let list_all_available_users: Vec<Availability> =
+        let list_all_available_users: Vec<AvailabilitySpot> =
             bubble_sort(&mut list_all_available_users.to_owned());
 
         // Sort the list of available users based on chosen count
-        let list_all_available_users: Vec<Option<Availability>> =
+        let list_all_available_users: Vec<Option<AvailabilitySpot>> =
             sort_lowest_to_highest_count(list_all_available_users, chosen_users, list_vast_users);
 
         // Process the available list (x logic per role) amount of time
@@ -284,10 +284,10 @@ pub fn get_available_users(
         //? If the list of available Vast users is not empty
     } else {
         // Assuming the type of elements in list_all_available_users is User
-        let mut the_user_role_list: Vec<Option<Availability>> = Vec::new();
+        let mut the_user_role_list: Vec<Option<AvailabilitySpot>> = Vec::new();
 
         // Sort list_all_available_users by time
-        let list_all_available_users: Vec<Availability> =
+        let list_all_available_users: Vec<AvailabilitySpot> =
             bubble_sort(&mut list_all_available_users.to_owned());
 
         // Sort the list of available users based on chosen count

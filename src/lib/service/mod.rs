@@ -1,5 +1,6 @@
 pub mod lib;
 pub mod scheduler;
+pub mod things;
 
 use crate::data::db;
 use crate::domain::ScheduleTime;

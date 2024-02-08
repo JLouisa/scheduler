@@ -2,7 +2,7 @@ use crate::data::DbId;
 use derive_more::Constructor;
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Serialize, Deserialize, Constructor)]
+#[derive(Debug, Clone, Serialize, Deserialize, Constructor, PartialEq, PartialOrd)]
 pub struct UserID(DbId);
 
 impl UserID {

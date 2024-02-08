@@ -1,7 +1,7 @@
 use crate::domain::user::UserError;
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Deserialize, Serialize)]
+#[derive(Debug, Clone, Deserialize, Serialize, PartialEq, PartialOrd)]
 pub struct EmployeeID(String);
 
 impl EmployeeID {

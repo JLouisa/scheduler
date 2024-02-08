@@ -1,6 +1,8 @@
 pub mod field;
 
+use crate::data::DbId;
 use serde::{Deserialize, Serialize};
+use std::str::FromStr;
 use thiserror::Error;
 
 #[derive(Debug, Error)]
@@ -27,7 +29,7 @@ pub enum UserError {
     InvalidRoleSecondary(String),
 }
 
-#[derive(Debug, Deserialize, Serialize, Clone)]
+#[derive(Debug, Deserialize, Serialize, Clone, PartialEq, PartialOrd)]
 pub struct User {
     pub id: field::UserID,
     pub name: field::Name,
@@ -39,4 +41,30 @@ pub struct User {
     pub max_days: field::MaxDays,
     pub role_primary: field::RolePrimary,
     pub role_secondary: field::RoleSecondary,
+}
+impl User {
+    pub fn create_user(
+        id: &str,
+        name: &str,
+        admin: bool,
+        vast: bool,
+        active: bool,
+        min: &str,
+        max: &str,
+        prim: &str,
+        sec: &str,
+    ) -> Self {
+        Self {
+            id: field::UserID::new(DbId::from_str(id).unwrap()),
+            name: field::Name::new(name).unwrap(),
+            employee_id: field::EmployeeID::new(id).unwrap(),
+            admin: field::Admin::new(admin),
+            vast: field::Vast::new(vast),
+            active: field::Active::new(active),
+            min_days: field::MinDays::new(min).unwrap(),
+            max_days: field::MaxDays::new(max).unwrap(),
+            role_primary: field::RolePrimary::new(prim).unwrap(),
+            role_secondary: field::RoleSecondary::new(sec).unwrap(),
+        }
+    }
 }

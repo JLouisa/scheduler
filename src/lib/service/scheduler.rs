@@ -1,6 +1,6 @@
 use super::lib;
 
-use crate::domain::availability::{self, Availability};
+use crate::domain::availability::{self, AvailabilitySpot};
 use crate::domain::user::User;
 use crate::domain::{week, Role, ScheduleDay, ScheduleTime};
 use crate::service::Logic;
@@ -9,7 +9,7 @@ use std::collections::HashMap;
 
 use enum_iterator::all;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, PartialOrd)]
 pub struct Employee {
     id: availability::field::AvailabilityId,
     name: availability::field::Name,
@@ -59,7 +59,7 @@ pub struct WeekSchedule {
 
 ///* Calculate the schedule for a role of the user
 pub fn calc_schedule_role(
-    available_list: &Vec<Availability>,
+    available_list: &Vec<AvailabilitySpot>,
     user_list: &Vec<User>,
     logic: &Vec<ScheduleTime>,
     role: &Role,
@@ -67,7 +67,7 @@ pub fn calc_schedule_role(
     chosen_users: &mut HashMap<String, u8>,
 ) -> Vec<Employee> {
     // Process Role
-    let users: Vec<Option<Availability>> =
+    let users: Vec<Option<AvailabilitySpot>> =
         lib::get_available_users(available_list, user_list, logic, role, day, chosen_users);
 
     let mut list_of_employees = Vec::new();
@@ -125,7 +125,7 @@ pub fn calc_schedule_role(
 
 ///* Calculate the schedule for a day of the week
 pub fn calc_schedule_day(
-    all_availability: &Vec<Availability>,
+    all_availability: &Vec<AvailabilitySpot>,
     all_users: &Vec<User>,
     schedule_logic: &Logic,
     day: &ScheduleDay,
@@ -167,7 +167,7 @@ pub fn calc_schedule_day(
 
 ///* Calculate the schedule for week of the staff
 pub fn calc_schedule_week(
-    all_availability: &Vec<Availability>,
+    all_availability: &Vec<AvailabilitySpot>,
     all_users: &Vec<User>,
     schedule_logic: &Logic,
     chosen_users: &mut HashMap<String, u8>,
