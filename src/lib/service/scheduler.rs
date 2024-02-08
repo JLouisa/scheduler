@@ -29,30 +29,30 @@ impl Employee {
 
 #[derive(Debug, Clone)]
 pub struct Employees {
-    manager: Option<Vec<Employee>>,
-    griller: Option<Vec<Employee>>,
-    kitchen: Option<Vec<Employee>>,
-    bar: Option<Vec<Employee>>,
-    dishwashers: Option<Vec<Employee>>,
-    servers: Option<Vec<Employee>>,
+    pub manager: Option<Vec<Employee>>,
+    pub griller: Option<Vec<Employee>>,
+    pub kitchen: Option<Vec<Employee>>,
+    pub bar: Option<Vec<Employee>>,
+    pub dishwashers: Option<Vec<Employee>>,
+    pub servers: Option<Vec<Employee>>,
 }
 
 #[derive(Debug, Clone)]
 pub struct DaySchedule {
-    day: week::field::Days,
-    employees: Employees,
+    pub day: week::field::Days,
+    pub employees: Employees,
 }
 
 #[derive(Debug)]
 pub struct WeekSchedule {
-    weekly_id: week::field::WeeklyId,
-    monday: DaySchedule,
-    tuesday: DaySchedule,
-    wednesday: DaySchedule,
-    thursday: DaySchedule,
-    friday: DaySchedule,
-    saturday: DaySchedule,
-    sunday: DaySchedule,
+    pub weekly_id: week::field::WeeklyId,
+    pub monday: DaySchedule,
+    pub tuesday: DaySchedule,
+    pub wednesday: DaySchedule,
+    pub thursday: DaySchedule,
+    pub friday: DaySchedule,
+    pub saturday: DaySchedule,
+    pub sunday: DaySchedule,
 }
 
 //? -------------------->

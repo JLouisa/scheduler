@@ -11,12 +11,12 @@ use self::scheduler::WeekSchedule;
 
 #[derive(Debug)]
 pub struct Logic {
-    manager: Vec<ScheduleTime>,
-    griller: Vec<ScheduleTime>,
-    kitchen: Vec<ScheduleTime>,
-    bar: Vec<ScheduleTime>,
-    dishwashers: Vec<ScheduleTime>,
-    servers: Vec<ScheduleTime>,
+    pub manager: Vec<ScheduleTime>,
+    pub griller: Vec<ScheduleTime>,
+    pub kitchen: Vec<ScheduleTime>,
+    pub bar: Vec<ScheduleTime>,
+    pub dishwashers: Vec<ScheduleTime>,
+    pub servers: Vec<ScheduleTime>,
 }
 
 pub fn schedule_setup() -> WeekSchedule {
