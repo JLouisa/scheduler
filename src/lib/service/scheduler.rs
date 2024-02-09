@@ -1,10 +1,12 @@
 use super::setup::InfoMatrix;
 
+use crate::data::DbId;
 use crate::domain::availability::{self};
 use crate::domain::{week, ScheduleTime};
 use crate::service::Logic;
 
 use std::collections::HashMap;
+use std::str::FromStr;
 
 // use enum_iterator::all;
 
@@ -16,6 +18,19 @@ pub struct Employee {
     time_given: availability::field::Time,
 }
 impl Employee {
+    pub fn create(
+        id: &str,
+        name: &str,
+        time_available: ScheduleTime,
+        time_given: ScheduleTime,
+    ) -> Self {
+        Self {
+            id: availability::field::AvailabilityId::new(DbId::from_str(id).unwrap()),
+            name: availability::field::Name::new(name).unwrap(),
+            time_available: availability::field::Time::create(time_available),
+            time_given: availability::field::Time::create(time_given),
+        }
+    }
     pub fn no_user() -> Self {
         Self {
             id: availability::field::AvailabilityId::default(),

@@ -1,4 +1,5 @@
 use crate::domain::{availability::AvailabilitySpot, user::User, Role, ScheduleDay};
+use crate::service::lib;
 
 #[derive(Debug)]
 pub struct Roles {
@@ -16,37 +17,37 @@ impl Roles {
         day: &ScheduleDay,
     ) -> Self {
         Self {
-            management: sort_available_spots_current_day_on_role(
+            management: sort_available_spots_current_day_on_role_bubble(
                 user_list,
                 available_list,
                 day,
                 &Role::Management,
             ),
-            griller: sort_available_spots_current_day_on_role(
+            griller: sort_available_spots_current_day_on_role_bubble(
                 user_list,
                 available_list,
                 day,
                 &Role::Griller,
             ),
-            kitchen: sort_available_spots_current_day_on_role(
+            kitchen: sort_available_spots_current_day_on_role_bubble(
                 user_list,
                 available_list,
                 day,
                 &Role::Kitchen,
             ),
-            bar: sort_available_spots_current_day_on_role(
+            bar: sort_available_spots_current_day_on_role_bubble(
                 user_list,
                 available_list,
                 day,
                 &Role::Bar,
             ),
-            dishwasher: sort_available_spots_current_day_on_role(
+            dishwasher: sort_available_spots_current_day_on_role_bubble(
                 user_list,
                 available_list,
                 day,
                 &Role::Dishwasher,
             ),
-            service: sort_available_spots_current_day_on_role(
+            service: sort_available_spots_current_day_on_role_bubble(
                 user_list,
                 available_list,
                 day,
@@ -164,7 +165,41 @@ pub fn sort_available_spots_current_day_on_role(
         }
     }
 
+    // Sort list on time supplied
+    // return lib::bubble_sort_on_time_option(final_list);
     return final_list;
+}
+
+// Sort all available spots list and return list of available based on day and role
+pub fn sort_available_spots_current_day_on_role_bubble(
+    user_list: &Vec<User>,
+    available_list: &Vec<AvailabilitySpot>,
+    day: &ScheduleDay,
+    role: &Role,
+) -> Vec<Option<AvailabilitySpot>> {
+    let mut final_list: Vec<Option<AvailabilitySpot>> = Vec::new();
+
+    // User on role
+    let filtered_user_list: Vec<User> = filter_all_user_on_role(&user_list, role);
+
+    // Spots on day
+    let filtered_available_list: Vec<Option<AvailabilitySpot>> =
+        filter_available_spots_current_day(available_list.clone(), day);
+
+    if filtered_available_list.is_empty() {
+        return filtered_available_list;
+    }
+
+    for user in filtered_user_list {
+        for available in filtered_available_list.iter() {
+            if available.clone().unwrap().user_id.to_the_string() == user.id.to_the_string() {
+                final_list.push(available.clone());
+            }
+        }
+    }
+
+    // Sort list on time supplied
+    return lib::bubble_sort_on_time_option(final_list);
 }
 
 #[cfg(test)]

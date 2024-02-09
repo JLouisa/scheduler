@@ -30,7 +30,17 @@ pub struct AvailabilitySpot {
 impl AvailabilitySpot {
     pub fn create(id: &str, name: &str, day: &str, time: &str) -> Self {
         Self {
-            // id: field::id::new()
+            // id: field::id::Id::new()
+            user_id: field::AvailabilityId::new(DbId::from_str(id).unwrap()),
+            weekly_id: field::WeeklyId::new(),
+            name: field::Name::new(name).unwrap(),
+            day: field::Days::new(day),
+            time: field::Time::new(time),
+        }
+    }
+    pub fn new(id: &str, name: &str, day: &str, time: &str) -> Self {
+        Self {
+            // id: field::id::Id::new(),
             user_id: field::AvailabilityId::new(DbId::from_str(id).unwrap()),
             weekly_id: field::WeeklyId::new(),
             name: field::Name::new(name).unwrap(),

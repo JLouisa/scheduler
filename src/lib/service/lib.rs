@@ -55,6 +55,29 @@ pub fn bubble_sort_on_time(arr: &mut Vec<AvailabilitySpot>) -> Vec<AvailabilityS
     return list;
 }
 
+// Function to sort the availability list
+pub fn bubble_sort_on_time_option(
+    arr: Vec<Option<AvailabilitySpot>>,
+) -> Vec<Option<AvailabilitySpot>> {
+    let mut n = arr.len();
+    let mut swapped = true;
+    let mut list = arr.clone();
+
+    while swapped {
+        swapped = false;
+        for i in 1..n {
+            if list[i - 1].clone().unwrap().time.into_inner()
+                > list[i].clone().unwrap().time.into_inner()
+            {
+                list.swap(i - 1, i);
+                swapped = true;
+            }
+        }
+        n -= 1;
+    }
+    return list;
+}
+
 // Function to increase the chosen user count
 pub fn increase_chosen_user_count(user: &str, chosen_users_list: &mut HashMap<String, u8>) {
     let chosen_user = chosen_users_list.get_mut(user);
@@ -188,7 +211,7 @@ pub fn sort_available_users_on_role(
             }
         }
     }
-    new_vec
+    return new_vec;
 }
 
 #[cfg(test)]
