@@ -1,8 +1,10 @@
 use super::setup::InfoMatrix;
 
 use crate::data::DbId;
-use crate::domain::availability::{self};
-use crate::domain::{week, ScheduleTime};
+use crate::domain::availability::{self, AvailabilitySpot};
+use crate::domain::user::User;
+use crate::domain::{week, Role, ScheduleTime};
+use crate::service::setup;
 use crate::service::Logic;
 
 use std::collections::HashMap;
@@ -39,16 +41,41 @@ impl Employee {
             time_given: availability::field::Time::create(ScheduleTime::None),
         }
     }
+    pub fn new(available: &Option<AvailabilitySpot>, the_time: ScheduleTime) -> Self {
+        if available.is_some() {
+            Self::create(
+                available
+                    .clone()
+                    .expect("unwrapping available ID in Employee impl.")
+                    .user_id
+                    .to_the_string()
+                    .as_str(),
+                available
+                    .clone()
+                    .expect("unwrapping available name in Employee impl.")
+                    .name
+                    .as_str(),
+                available
+                    .clone()
+                    .expect("unwrapping available time in Employee impl.")
+                    .time
+                    .into_inner(),
+                the_time,
+            )
+        } else {
+            Self::no_user()
+        }
+    }
 }
 
 #[derive(Debug, Clone)]
 pub struct Employees {
-    pub manager: Option<Vec<Employee>>,
-    pub griller: Option<Vec<Employee>>,
-    pub kitchen: Option<Vec<Employee>>,
-    pub bar: Option<Vec<Employee>>,
-    pub dishwashers: Option<Vec<Employee>>,
-    pub servers: Option<Vec<Employee>>,
+    pub manager: Vec<Employee>,
+    pub griller: Vec<Employee>,
+    pub kitchen: Vec<Employee>,
+    pub bar: Vec<Employee>,
+    pub dishwashers: Vec<Employee>,
+    pub servers: Vec<Employee>,
 }
 
 #[derive(Debug, Clone)]
@@ -74,12 +101,55 @@ pub fn calc_schedule_week(
     sorted_week: InfoMatrix,
     schedule_logic: Logic,
     chosen_users: &mut HashMap<String, u8>,
+    all_users: Vec<User>,
 ) {
-    let griller = sorted_week.monday.roles.griller;
-    println!("Griller: {:?}", griller);
-    println!("");
+}
 
-    let management = sorted_week.monday.roles.management;
-    println!("Management: {:?}", management);
-    println!("");
+pub fn calc_schedule_week_manager(
+    manager_list: &Vec<Option<AvailabilitySpot>>,
+    schedule_logic: Logic,
+    chosen_users: &mut HashMap<String, u8>,
+    all_users: &Vec<User>,
+) -> Vec<Option<AvailabilitySpot>> {
+    let mut new_manager_list = Vec::new();
+    let mut hold_list = Vec::new();
+    let length_manager_list = schedule_logic.manager.len();
+    let users_by_role = setup::filter_all_user_on_role(all_users, &Role::Management);
+
+    for user in manager_list.iter() {
+        if user.is_some() {
+            let available = user
+                .clone()
+                .expect("Unable to unwrap user in calc_schedule_week_manager");
+            let chosen = chosen_users.get(&available.user_id.to_the_string());
+            let found_user = users_by_role
+                .iter()
+                .find(|&x| x.id.to_the_string() == available.user_id.to_the_string());
+
+            if found_user.is_some() && chosen.is_some() {
+                let found_user =
+                    found_user.expect("Unable to unwrap found_user in calc_schedule_week_manager");
+                let chosen = chosen.expect("Unable to unwrap chosen in calc_schedule_week_manager");
+
+                if *chosen < found_user.max_days.ref_into_inner()
+                    && found_user.vast.into_inner() == &true
+                {
+                    new_manager_list.push(user.clone());
+                    chosen_users.insert(available.user_id.to_the_string(), chosen + 1);
+                }
+            } else if let Some(chosen) = chosen {
+                if *chosen == 0 && new_manager_list.len() < length_manager_list {
+                    new_manager_list.push(user.clone());
+                    chosen_users.insert(available.user_id.to_the_string(), chosen + 1);
+                }
+            } else {
+                hold_list.push(user.clone())
+            }
+            if new_manager_list.len() >= length_manager_list {
+                break;
+            }
+        }
+    }
+
+    return new_manager_list;
 }

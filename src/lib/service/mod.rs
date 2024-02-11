@@ -21,15 +21,11 @@ pub fn schedule_setup() {
     // 1. Get all the users from the database
     let all_users = db::get_all_mock_users(10);
 
-    // 1.1 Create a list of weekly chosen users
-    let mut chosen_users: HashMap<String, u8> = HashMap::new();
-    for user in all_users.iter() {
-        chosen_users.insert(user.id.to_the_string(), 0);
-    }
-
     // 2. Get all the user availability for the week
     let all_availability = web::get_all_mock_data(70);
-    // println!("{:?}", all_availability);
+
+    // 1.1 Create a list of weekly chosen users
+    let mut chosen_users: HashMap<String, u8> = setup::create_hashmap_tracker(&all_users);
 
     let weekly_schedule = setup::create_info_matrix(&all_users, &all_availability);
 
@@ -49,7 +45,12 @@ pub fn schedule_setup() {
     };
 
     // Get the schedule for the week
-    let week = scheduler::calc_schedule_week(weekly_schedule, schedule_logic, &mut chosen_users);
+    let week = scheduler::calc_schedule_week(
+        weekly_schedule,
+        schedule_logic,
+        &mut chosen_users,
+        all_users,
+    );
 
     return week;
 }

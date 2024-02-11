@@ -1,5 +1,6 @@
 use crate::domain::{availability::AvailabilitySpot, user::User, Role, ScheduleDay};
-use crate::service::lib;
+use crate::service::{lib, Logic};
+use std::collections::HashMap;
 
 #[derive(Debug)]
 pub struct Roles {
@@ -137,6 +138,16 @@ pub fn filter_available_spots_current_day(
     return list;
 }
 
+// Create a list of weekly chosen users
+pub fn create_hashmap_tracker(filtered_user_list: &Vec<User>) -> HashMap<String, u8> {
+    let mut chosen_users: HashMap<String, u8> = HashMap::new();
+    for user in filtered_user_list {
+        chosen_users.insert(user.id.to_the_string(), 0);
+    }
+
+    return chosen_users;
+}
+
 // Sort all available spots list and return list of available based on day and role
 pub fn sort_available_spots_current_day_on_role(
     user_list: &Vec<User>,
@@ -199,7 +210,58 @@ pub fn sort_available_spots_current_day_on_role_bubble(
     }
 
     // Sort list on time supplied
-    return lib::bubble_sort_on_time_option(final_list);
+    let sorted_final_list: Vec<Option<AvailabilitySpot>> =
+        lib::bubble_sort_on_time_option(final_list);
+
+    return sorted_final_list;
+}
+
+pub fn find_user(user_id: &str, user_list: &Vec<User>) -> Option<User> {
+    let found_user: Option<User> = user_list
+        .iter()
+        .find(|user| user.id.to_the_string() == user_id)
+        .cloned();
+    return found_user;
+}
+
+pub fn increase_count_of_chosen_user(chosen: &mut HashMap<String, u8>, user_id: &str) {
+    if let Some(count) = chosen.get_mut(user_id) {
+        *count += 1;
+    }
+}
+
+fn sort_availability_list_with_chosen(
+    list: Vec<Option<AvailabilitySpot>>,
+    chosen: &mut HashMap<String, u8>,
+    user_list: &Vec<User>,
+    logic: Logic,
+) -> Vec<Option<AvailabilitySpot>> {
+    let mut new_list: Vec<Option<AvailabilitySpot>> = Vec::new();
+    let mut hold_list: Vec<Option<AvailabilitySpot>> = Vec::new();
+
+    for availability_max_day in &list {
+        if availability_max_day.is_some() {
+            match availability_max_day {
+                Some(availability) => {
+                    let user_id_str = availability.user_id.to_the_string();
+                    if let Some(count) = chosen.get(user_id_str.as_str()) {
+                        if let Some(user) = find_user(user_id_str.as_str(), user_list) {
+                            if *count < user.max_days.into_inner() {
+                                new_list.push(Some(availability.clone()));
+                                continue;
+                            }
+                        }
+                    }
+                }
+                None => {}
+            }
+        } else {
+            hold_list.push(availability_max_day.clone());
+        }
+    }
+
+    new_list.extend(hold_list);
+    return new_list;
 }
 
 #[cfg(test)]
