@@ -296,7 +296,7 @@ mod test {
             true,
             "3",
             "4",
-            "service",
+            "management",
             "Bar",
         );
         let user3 = User::create_user(

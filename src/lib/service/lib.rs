@@ -84,14 +84,14 @@ pub fn increase_chosen_user_count(user: &str, chosen_users_list: &mut HashMap<St
     match chosen_user {
         Some(value) => {
             *value += 1;
-            println!(
-                "The ID is {:?} and the times they were chosen is {:?}",
-                user, value
-            )
+            // println!(
+            //     "The ID is {:?} and the times they were chosen is {:?}",
+            //     user, value
+            // )
         }
         None => {
             // Handle the case where the key doesn't exist
-            println!("Key {:?} not found in the HashMap", user);
+            // println!("Key {:?} not found in the HashMap", user);
         }
     }
 }
@@ -147,9 +147,6 @@ pub fn sort_lowest_to_highest_count(
 
         // Sort the new_hash
         new_vec_from_hash.sort_by(|a, b| a.0.cmp(&b.0));
-
-        // Debug
-        println!("This is the new hash: {:?}", new_vec_from_hash);
 
         // Iterate through the new_vec_from_hash and find the user
         // and push the user into the new_arr from low to high

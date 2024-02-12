@@ -4,6 +4,7 @@ use crate::data::DbId;
 use crate::domain::availability::{self, AvailabilitySpot};
 use crate::domain::user::User;
 use crate::domain::{week, Role, ScheduleTime};
+
 use crate::service::setup;
 use crate::service::Logic;
 
@@ -103,44 +104,61 @@ pub fn calc_schedule_week(
     chosen_users: &mut HashMap<String, u8>,
     all_users: Vec<User>,
 ) {
+    let managers_list = calc_schedule_week_manager(
+        &sorted_week.monday.roles.management,
+        &schedule_logic,
+        chosen_users,
+        &all_users,
+    );
+    for manager in managers_list.iter() {
+        if manager.is_some() {
+            println!(
+                "Managers List: {:?}",
+                manager.clone().expect("Unable to unwrap manager")
+            );
+        } else {
+            println!("Managers List: None");
+        }
+    }
 }
 
 pub fn calc_schedule_week_manager(
-    manager_list: &Vec<Option<AvailabilitySpot>>,
-    schedule_logic: Logic,
+    manager_list: &[Option<AvailabilitySpot>],
+    schedule_logic: &Logic,
     chosen_users: &mut HashMap<String, u8>,
     all_users: &Vec<User>,
 ) -> Vec<Option<AvailabilitySpot>> {
     let mut new_manager_list = Vec::new();
     let mut hold_list = Vec::new();
+
     let length_manager_list = schedule_logic.manager.len();
     let users_by_role = setup::filter_all_user_on_role(all_users, &Role::Management);
 
-    for user in manager_list.iter() {
-        if user.is_some() {
-            let available = user
-                .clone()
-                .expect("Unable to unwrap user in calc_schedule_week_manager");
+    for user in manager_list {
+        if let Some(available) = user {
             let chosen = chosen_users.get(&available.user_id.to_the_string());
-            let found_user = users_by_role
+            if let Some(found_user) = users_by_role
                 .iter()
-                .find(|&x| x.id.to_the_string() == available.user_id.to_the_string());
-
-            if found_user.is_some() && chosen.is_some() {
-                let found_user =
-                    found_user.expect("Unable to unwrap found_user in calc_schedule_week_manager");
-                let chosen = chosen.expect("Unable to unwrap chosen in calc_schedule_week_manager");
-
-                if *chosen < found_user.max_days.ref_into_inner()
-                    && found_user.vast.into_inner() == &true
-                {
-                    new_manager_list.push(user.clone());
-                    chosen_users.insert(available.user_id.to_the_string(), chosen + 1);
+                .find(|&x| x.id.to_the_string() == available.user_id.to_the_string())
+            {
+                if let Some(chosen) = chosen {
+                    if *chosen < found_user.max_days.ref_into_inner()
+                        && found_user.vast.into_inner() == &true
+                    {
+                        new_manager_list.push(user.clone());
+                        chosen_users
+                            .entry(available.user_id.to_the_string())
+                            .and_modify(|count| *count += 1)
+                            .or_insert(1);
+                    }
                 }
             } else if let Some(chosen) = chosen {
                 if *chosen == 0 && new_manager_list.len() < length_manager_list {
                     new_manager_list.push(user.clone());
-                    chosen_users.insert(available.user_id.to_the_string(), chosen + 1);
+                    chosen_users
+                        .entry(available.user_id.to_the_string())
+                        .and_modify(|count| *count += 1)
+                        .or_insert(1);
                 }
             } else {
                 hold_list.push(user.clone())
@@ -150,6 +168,194 @@ pub fn calc_schedule_week_manager(
             }
         }
     }
+    new_manager_list.extend_from_slice(&hold_list);
+    new_manager_list
+}
 
-    return new_manager_list;
+#[cfg(test)]
+mod test {
+    use super::*;
+    use crate::data::{db, DbId};
+    use crate::domain::availability::AvailabilitySpot;
+    use crate::domain::week::field::Days;
+    use crate::domain::ScheduleTime;
+    use crate::service::{scheduler, Logic};
+
+    use std::collections::HashMap;
+
+    #[test]
+    fn test_calc_schedule_week_manager() {
+        // 3. Get the schedule logic
+        let schedule_logic = Logic {
+            manager: vec![ScheduleTime::StartAtThree],
+            griller: vec![ScheduleTime::StartAtThree],
+            kitchen: vec![ScheduleTime::StartAtThree, ScheduleTime::StartAtSix],
+            bar: vec![ScheduleTime::StartAtSix],
+            dishwashers: vec![ScheduleTime::StartAtSix],
+            servers: vec![
+                ScheduleTime::StartAtThree,
+                ScheduleTime::StartAtFive,
+                ScheduleTime::StartAtSix,
+                ScheduleTime::OnCallAtSix,
+            ],
+        };
+
+        let user1 = User::create_user(
+            "3da93583-e85f-4e21-b0b7-ade14abd72ae",
+            "Eve",
+            false,
+            false,
+            true,
+            "4",
+            "5",
+            "griller",
+            "kitchen",
+        );
+        let user2 = User::create_user(
+            "a184afa7-1aeb-4cea-b8a8-278caa2dc36a",
+            "Jane",
+            false,
+            false,
+            true,
+            "2",
+            "3",
+            "service",
+            "Bar",
+        );
+        let user3 = User::create_user(
+            "8ad23b27-707f-429c-b332-f504b2708185",
+            "John",
+            false,
+            true,
+            true,
+            "5",
+            "5",
+            "management",
+            "dishwasher",
+        );
+        let user4 = User::create_user(
+            "5b3e2a19-fd6d-478e-a69c-3c679449f34a",
+            "Alice",
+            false,
+            false,
+            true,
+            "4",
+            "5",
+            "kitchen",
+            "all",
+        );
+
+        // Eve
+
+        let available1 = AvailabilitySpot::create(
+            "3da93583-e85f-4e21-b0b7-ade14abd72ae",
+            "Eve",
+            "monday",
+            "13",
+        );
+
+        let available2 = AvailabilitySpot::create(
+            "3da93583-e85f-4e21-b0b7-ade14abd72ae",
+            "Eve",
+            "tuesday",
+            "18",
+        );
+
+        let available3 = AvailabilitySpot::create(
+            "3da93583-e85f-4e21-b0b7-ade14abd72ae",
+            "Eve",
+            "wednesday",
+            "17",
+        );
+        // Jane
+
+        let available4 = AvailabilitySpot::create(
+            "a184afa7-1aeb-4cea-b8a8-278caa2dc36a",
+            "Jane",
+            "monday",
+            "15",
+        );
+
+        let available5 = AvailabilitySpot::create(
+            "a184afa7-1aeb-4cea-b8a8-278caa2dc36a",
+            "Jane",
+            "tuesday",
+            "17",
+        );
+
+        let available6 = AvailabilitySpot::create(
+            "a184afa7-1aeb-4cea-b8a8-278caa2dc36a",
+            "Jane",
+            "thursday",
+            "(17)",
+        );
+
+        // John
+
+        let available7 = AvailabilitySpot::create(
+            "8ad23b27-707f-429c-b332-f504b2708185",
+            "John",
+            "monday",
+            "18",
+        );
+
+        let available8 = AvailabilitySpot::create(
+            "8ad23b27-707f-429c-b332-f504b2708185",
+            "John",
+            "tuesday",
+            "15",
+        );
+
+        let available9 = AvailabilitySpot::create(
+            "8ad23b27-707f-429c-b332-f504b2708185",
+            "John",
+            "friday",
+            "17(18)",
+        );
+
+        // Alice
+
+        let available10 = AvailabilitySpot::create(
+            "5b3e2a19-fd6d-478e-a69c-3c679449f34a",
+            "Alice",
+            "monday",
+            "18",
+        );
+
+        let available11 = AvailabilitySpot::create(
+            "5b3e2a19-fd6d-478e-a69c-3c679449f34a",
+            "Alice",
+            "tuesday",
+            "15",
+        );
+
+        let available12 = AvailabilitySpot::create(
+            "5b3e2a19-fd6d-478e-a69c-3c679449f34a",
+            "Alice",
+            "saturday",
+            "17(18)",
+        );
+
+        let all_users = vec![user1, user2, user3, user4];
+        let available = vec![Some(available4.clone()), Some(available8.clone())];
+        let manager_list = vec![user3];
+
+        // 1.1 Create a list of weekly chosen users
+        let mut chosen_users: HashMap<String, u8> = setup::create_hashmap_tracker(&all_users);
+
+        let role = Role::Management;
+
+        let result = scheduler::calc_schedule_week_manager(
+            &available,
+            &schedule_logic,
+            &mut chosen_users,
+            &all_users,
+        );
+        let expected = vec![user2.clone(), user4.clone()];
+
+        assert_eq!(
+            result, expected,
+            "Expecting employees to sort based on role1"
+        );
+    }
 }
