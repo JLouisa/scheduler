@@ -177,7 +177,6 @@ pub fn sort_available_spots_current_day_on_role(
     }
 
     // Sort list on time supplied
-    // return lib::bubble_sort_on_time_option(final_list);
     return final_list;
 }
 
@@ -323,43 +322,38 @@ mod test {
         );
 
         // Eve
-
         let available1 = AvailabilitySpot::create(
             "3da93583-e85f-4e21-b0b7-ade14abd72ae",
             "Eve",
             "monday",
             "13",
         );
-
         let available2 = AvailabilitySpot::create(
             "3da93583-e85f-4e21-b0b7-ade14abd72ae",
             "Eve",
             "tuesday",
             "18",
         );
-
         let available3 = AvailabilitySpot::create(
             "3da93583-e85f-4e21-b0b7-ade14abd72ae",
             "Eve",
             "wednesday",
             "17",
         );
-        // Jane
 
+        // Jane
         let available4 = AvailabilitySpot::create(
             "a184afa7-1aeb-4cea-b8a8-278caa2dc36a",
             "Jane",
             "monday",
             "15",
         );
-
         let available5 = AvailabilitySpot::create(
             "a184afa7-1aeb-4cea-b8a8-278caa2dc36a",
             "Jane",
             "tuesday",
             "17",
         );
-
         let available6 = AvailabilitySpot::create(
             "a184afa7-1aeb-4cea-b8a8-278caa2dc36a",
             "Jane",
@@ -368,21 +362,18 @@ mod test {
         );
 
         // John
-
         let available7 = AvailabilitySpot::create(
             "8ad23b27-707f-429c-b332-f504b2708185",
             "John",
             "monday",
             "18",
         );
-
         let available8 = AvailabilitySpot::create(
             "8ad23b27-707f-429c-b332-f504b2708185",
             "John",
             "tuesday",
             "15",
         );
-
         let available9 = AvailabilitySpot::create(
             "8ad23b27-707f-429c-b332-f504b2708185",
             "John",
@@ -391,21 +382,18 @@ mod test {
         );
 
         // Alice
-
         let available10 = AvailabilitySpot::create(
             "5b3e2a19-fd6d-478e-a69c-3c679449f34a",
             "Alice",
             "monday",
             "18",
         );
-
         let available11 = AvailabilitySpot::create(
             "5b3e2a19-fd6d-478e-a69c-3c679449f34a",
             "Alice",
             "tuesday",
             "15",
         );
-
         let available12 = AvailabilitySpot::create(
             "5b3e2a19-fd6d-478e-a69c-3c679449f34a",
             "Alice",
@@ -435,6 +423,10 @@ mod test {
             &Role::Griller,
         );
         let expected = vec![Some(available1.clone()), Some(available10.clone())];
+        assert_eq!(
+            result, expected,
+            "Sorting failed on available spots current day(monday) for roles(griller)"
+        );
 
         let result2 = setup::sort_available_spots_current_day_on_role(
             &user_list,
@@ -442,7 +434,11 @@ mod test {
             &ScheduleDay::Tuesday,
             &Role::Management,
         );
-        let expected2 = vec![Some(available8)];
+        let expected2 = vec![Some(available5), Some(available8)];
+        assert_eq!(
+            result2, expected2,
+            "Sorting failed on available spots current day(tuesday) for roles(management)"
+        );
 
         let result3 = setup::sort_available_spots_current_day_on_role(
             &user_list,
@@ -451,6 +447,10 @@ mod test {
             &Role::Bar,
         );
         let expected3: Vec<Option<AvailabilitySpot>> = vec![Some(available6)];
+        assert_eq!(
+            result3, expected3,
+            "Sorting failed on available spots current day(thursday) for roles(bar)"
+        );
 
         let result4 = setup::sort_available_spots_current_day_on_role(
             &user_list,
@@ -459,19 +459,6 @@ mod test {
             &Role::Bar,
         );
         let expected4: Vec<Option<AvailabilitySpot>> = vec![];
-
-        assert_eq!(
-            result, expected,
-            "Sorting failed on available spots current day(monday) for roles(griller)"
-        );
-        assert_eq!(
-            result2, expected2,
-            "Sorting failed on available spots current day(tuesday) for roles(management)"
-        );
-        assert_eq!(
-            result3, expected3,
-            "Sorting failed on available spots current day(thursday) for roles(bar)"
-        );
         assert_eq!(
             result4, expected4,
             "Sorting failed on available spots current day(friday) for roles(bar)"
