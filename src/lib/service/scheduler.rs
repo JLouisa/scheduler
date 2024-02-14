@@ -123,53 +123,46 @@ pub fn calc_schedule_week(
 }
 
 pub fn calc_schedule_week_manager(
-    manager_list: &[Option<AvailabilitySpot>],
+    manager_list: &Vec<Option<AvailabilitySpot>>,
     schedule_logic: &Logic,
     chosen_users: &mut HashMap<String, u8>,
     all_users: &Vec<User>,
 ) -> Vec<Option<AvailabilitySpot>> {
     let mut new_manager_list = Vec::new();
     let mut hold_list = Vec::new();
-
-    let length_manager_list = schedule_logic.manager.len();
+    let logic_length_manager_list = schedule_logic.manager.len();
     let users_by_role = setup::filter_all_user_on_role(all_users, &Role::Management);
 
-    for user in manager_list {
-        if let Some(available) = user {
-            let chosen = chosen_users.get(&available.user_id.to_the_string());
-            if let Some(found_user) = found_user(&users_by_role, &available) {
-                if let Some(chosen) = chosen {
-                    if *chosen < found_user.max_days.ref_into_inner()
-                        && found_user.vast.into_inner() == &true
-                    {
-                        new_manager_list.push(user.clone());
-                        chosen_users
-                            .entry(available.user_id.to_the_string())
-                            .and_modify(|count| *count += 1)
-                            .or_insert(1);
-                    }
-                }
-            } else if let Some(chosen) = chosen {
-                if *chosen == 0 && new_manager_list.len() < length_manager_list {
-                    new_manager_list.push(user.clone());
-                    chosen_users
-                        .entry(available.user_id.to_the_string())
-                        .and_modify(|count| *count += 1)
-                        .or_insert(1);
-                }
-            } else {
-                hold_list.push(user.clone())
+    // Manager list getting from filter available list
+    for available_spot_option in manager_list {
+        if available_spot_option.is_some() {
+            let available = available_spot_option.clone().unwrap();
+            // let chosen = chosen_users.get(&available.user_id.to_the_string());
+            let found_user = found_user_fn(&users_by_role, &available_spot_option.clone().unwrap());
+            // Process if the user is found in the list of users
+            if found_user.is_some() {
+                increase_chosen_user_count(
+                    // &chosen,
+                    &found_user.unwrap(),
+                    &mut new_manager_list,
+                    chosen_users,
+                    &available,
+                );
             }
-            if new_manager_list.len() >= length_manager_list {
-                break;
-            }
+        } else {
+            hold_list.push(available_spot_option.clone());
+        }
+
+        if new_manager_list.len() >= logic_length_manager_list {
+            break;
         }
     }
+
     new_manager_list.extend_from_slice(&hold_list);
     new_manager_list
 }
 
-fn found_user(users_by_role: &Vec<User>, available: &AvailabilitySpot) -> Option<User> {
+fn found_user_fn(users_by_role: &Vec<User>, available: &AvailabilitySpot) -> Option<User> {
     let found_user = users_by_role
         .iter()
         .cloned()
@@ -177,19 +170,39 @@ fn found_user(users_by_role: &Vec<User>, available: &AvailabilitySpot) -> Option
     return found_user;
 }
 
+fn increase_chosen_user_count(
+    // chosen: &Option<&u8>,
+    found_user: &User,
+    new_manager_list: &mut Vec<Option<AvailabilitySpot>>,
+    chosen_users: &mut HashMap<String, u8>,
+    available: &AvailabilitySpot,
+) {
+    let chosen = chosen_users.get(&available.user_id.to_the_string());
+
+    if let Some(chosen_num) = chosen {
+        if *chosen_num < found_user.max_days.ref_into_inner()
+            && found_user.vast.into_inner() == &true
+        {
+            new_manager_list.push(Some(available.clone()));
+            chosen_users
+                .entry(available.user_id.to_the_string())
+                .and_modify(|count| *count += 1)
+                .or_insert(1);
+        }
+    }
+}
+
 #[cfg(test)]
 mod test {
     use super::*;
-    use crate::data::{db, DbId};
     use crate::domain::availability::AvailabilitySpot;
-    use crate::domain::week::field::Days;
     use crate::domain::ScheduleTime;
     use crate::service::{scheduler, Logic};
 
     use std::collections::HashMap;
 
-    // #[test]
-    // #[ignore]
+    #[test]
+    #[ignore]
     fn test_calc_schedule_week_manager() {
         // 3. Get the schedule logic
         let schedule_logic = Logic {
@@ -402,7 +415,7 @@ mod test {
         );
         let user4 = User::create_user(
             "5b3e2a19-fd6d-478e-a69c-3c679449f34a",
-            "Alice",
+            "Adam",
             false,
             false,
             true,
@@ -477,24 +490,24 @@ mod test {
             "17(18)",
         );
 
-        // Alice
+        // Adam
         let available10 = AvailabilitySpot::create(
             "5b3e2a19-fd6d-478e-a69c-3c679449f34a",
-            "Alice",
+            "Adam",
             "monday",
             "18",
         );
 
         let available11 = AvailabilitySpot::create(
             "5b3e2a19-fd6d-478e-a69c-3c679449f34a",
-            "Alice",
+            "Adam",
             "tuesday",
             "15",
         );
 
         let available12 = AvailabilitySpot::create(
             "5b3e2a19-fd6d-478e-a69c-3c679449f34a",
-            "Alice",
+            "Adam",
             "saturday",
             "17(18)",
         );
@@ -515,12 +528,26 @@ mod test {
             available12.clone(),
         ];
 
-        let result = scheduler::found_user(&all_users, &available1);
+        let result = scheduler::found_user_fn(&all_users, &available1);
         let expected = Some(user1);
 
         assert_eq!(
             result, expected,
             "Expecting Eve to be found in the list of users"
+        );
+        let result2 = scheduler::found_user_fn(&all_users, &available9);
+        let expected2 = Some(user3);
+
+        assert_eq!(
+            result2, expected2,
+            "Expecting John to be found in the list of users"
+        );
+        let result3 = scheduler::found_user_fn(&all_users, &available12);
+        let expected3 = Some(user4);
+
+        assert_eq!(
+            result3, expected3,
+            "Expecting Adam to be found in the list of users"
         );
     }
 }
