@@ -212,7 +212,7 @@ pub fn sort_available_spots_current_day_on_role_bubble(
     let sorted_final_list: Vec<Option<AvailabilitySpot>> =
         lib::bubble_sort_on_time_option(final_list);
 
-    return sorted_final_list;
+    sorted_final_list
 }
 
 pub fn find_user(user_id: &str, user_list: &Vec<User>) -> Option<User> {

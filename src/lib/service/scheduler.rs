@@ -122,6 +122,44 @@ pub fn calc_schedule_week(
     }
 }
 
+pub fn create_list(
+    users: Vec<User>,
+    list: Vec<Availability>,
+    logic: Vec<Time>,
+    mut chosen: HashMap<String, u32>,
+    day: Day,
+    role: Role,
+) -> Vec<Person> {
+    let mut new_list: Vec<Person> = Vec::new();
+    let skip_the_time = vec![Role::Dishwasher, Role::Bar];
+
+    for availability in list.iter().take(logic.len() - new_list.len()) {
+        let user = users.iter().find(|user| user.id == availability.user_id);
+        if let Some(user) = user {
+            let chosen_count = chosen.entry(availability.user_id.clone()).or_insert(0);
+            if *chosen_count >= user.max_days {
+                continue;
+            }
+
+            let mut time = logic[new_list.len()];
+            if day == Day::Monday && new_list.is_empty() && !skip_the_time.contains(&role) {
+                time = Time::StartAtOne;
+            }
+
+            let new_person = Person {
+                user_id: availability.user_id.clone(),
+                primary_role: user.primary_role.clone(),
+                time,
+            };
+            new_list.push(new_person);
+
+            *chosen_count += 1;
+        }
+    }
+
+    new_list
+}
+
 pub fn calc_schedule_week_manager(
     manager_list: &Vec<Option<AvailabilitySpot>>,
     schedule_logic: &Logic,
